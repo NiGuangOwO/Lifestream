@@ -19,8 +19,8 @@ namespace Lifestream.GUI
         {
             KoFiButton.DrawRight();
             ImGuiEx.EzTabBar("LifestreamTabs",
-                ("Settings", UISettings.Draw, null, true),
-                ("Service accounts", UIServiceAccount.Draw, null, true),
+                ("设置", UISettings.Draw, null, true),
+                ("账户", UIServiceAccount.Draw, null, true),
                 InternalLog.ImGuiTab(),
                 ("Debug", UIDebug.Draw, ImGuiColors.DalamudGrey3, true)
 

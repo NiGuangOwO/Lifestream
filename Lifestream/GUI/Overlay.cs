@@ -12,7 +12,7 @@ namespace Lifestream.GUI
 {
     internal class Overlay : Window
     {
-        public Overlay() : base("Lifestream Overlay", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing, true)
+        public Overlay() : base("Lifestream悬浮窗", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing, true)
         {
             IsOpen = true;
         }
@@ -110,7 +110,7 @@ namespace Lifestream.GUI
 
             if(P.ActiveAetheryte.Value.ID == 70 && P.Config.Firmament)
             {
-                var name = "Firmament";
+                var name = "天穹街";
                 ResizeButton(name);
                 if (ImGui.Button(name, ButtonSizeAetheryte))
                 {
@@ -128,14 +128,14 @@ namespace Lifestream.GUI
             }
             if (ImGui.BeginPopup($"LifestreamPopup{x.ID}"))
             {
-                if(ImGuiEx.CollectionCheckbox("Favorite", x.ID, P.Config.Favorites))
+                if(ImGuiEx.CollectionCheckbox("喜爱", x.ID, P.Config.Favorites))
                 {
                     PluginLog.Debug($"Rebuilding data store");
                     P.DataStore = new();
                 }
-                ImGuiEx.CollectionCheckbox("Hidden", x.ID, P.Config.Hidden);
+                ImGuiEx.CollectionCheckbox("隐藏", x.ID, P.Config.Hidden);
                 var newName = P.Config.Renames.TryGetValue(x.ID, out string value) ? value : "";
-                ImGuiEx.Text($"Rename:");
+                ImGuiEx.Text($"重命名：");
                 ImGui.SetNextItemWidth(200);
                 if(ImGui.InputText($"##LifestreamRename", ref newName, 100))
                 {

@@ -10,8 +10,8 @@ namespace Lifestream.GUI
     {
         internal static void Draw()
         {
-            ImGuiEx.TextWrapped($"If you own more than 1 service accounts, you must assign each character to the correct service account.\nTo make character appear in this list, please log into it.");
-            ImGui.Checkbox($"Get service account data from AutoRetainer", ref P.Config.UseAutoRetainerAccounts);
+            ImGuiEx.TextWrapped($"如果您拥有多个角色账户，则必须将每个角色分配给正确的账户。\n若要使角色出现在此列表中，请先登录。");
+            ImGui.Checkbox($"从AutoRetainer获取账户数据", ref P.Config.UseAutoRetainerAccounts);
             List<string> ManagedByAR = [];
             if (P.AutoRetainerApi?.Ready == true && P.Config.UseAutoRetainerAccounts)
             {
@@ -24,22 +24,22 @@ namespace Lifestream.GUI
                         var name = $"{data.Name}@{data.World}";
                         ManagedByAR.Add(name);
                         ImGui.SetNextItemWidth(150f);
-                        if (ImGui.BeginCombo($"{name}", data.ServiceAccount == -1 ? "Not selected" : $"Service account {data.ServiceAccount+1}"))
+                        if (ImGui.BeginCombo($"{name}", data.ServiceAccount == -1 ? "未选择" : $"角色 {data.ServiceAccount+1}"))
                         {
                             for (int i = 0; i < 10; i++)
                             {
-                                if (ImGui.Selectable($"Service account {i + 1}"))
+                                if (ImGui.Selectable($"角色 {i + 1}"))
                                 {
                                     P.Config.ServiceAccounts[name] = i;
                                     data.ServiceAccount = i;
                                     P.AutoRetainerApi.WriteOfflineCharacterData(data);
-                                    Notify.Info($"Setting saved to AutoRetainer");
+                                    Notify.Info($"设置保存到AutoRetainer");
                                 }
                             }
                             ImGui.EndCombo();
                         }
                         ImGui.SameLine();
-                        ImGuiEx.Text(ImGuiColors.DalamudRed, $"Managed by AutoRetainer");
+                        ImGuiEx.Text(ImGuiColors.DalamudRed, $"由AutoRetainer管理");
                     }
                 }
             }
@@ -47,16 +47,16 @@ namespace Lifestream.GUI
             {
                 if (ManagedByAR.Contains(x.Key)) continue;
                 ImGui.SetNextItemWidth(150f);
-                if (ImGui.BeginCombo($"{x.Key}", x.Value==-1?"Not selected":$"Service account {x.Value+1}"))
+                if (ImGui.BeginCombo($"{x.Key}", x.Value==-1?"未选择":$"角色 {x.Value+1}"))
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        if(ImGui.Selectable($"Service account {i+1}")) P.Config.ServiceAccounts[x.Key] = i;
+                        if(ImGui.Selectable($"角色 {i+1}")) P.Config.ServiceAccounts[x.Key] = i;
                     }
                     ImGui.EndCombo();
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Delete"))
+                if (ImGui.Button("删除"))
                 {
                     new TickScheduler(() => P.Config.ServiceAccounts.Remove(x.Key));
                 }

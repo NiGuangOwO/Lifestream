@@ -29,7 +29,7 @@ namespace Lifestream.GUI
             if (ImGui.IsWindowHovered())
             {
                 ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                ImGui.SetTooltip("Right click to stop all tasks");
+                ImGui.SetTooltip("右键中止所有任务");
                 if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
                 {
                     P.TaskManager.Abort();

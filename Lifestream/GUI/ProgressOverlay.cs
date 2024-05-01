@@ -1,50 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ECommons.SplatoonAPI;
 
-namespace Lifestream.GUI
+namespace Lifestream.GUI;
+
+internal class ProgressOverlay : Window
 {
-    internal class ProgressOverlay : Window
+    public ProgressOverlay() : base("Lifestream progress overlay", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize, true)
     {
-        public ProgressOverlay() : base("Lifestream progress overlay", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.AlwaysAutoResize, true)
-        {
-            this.IsOpen = true;
-            this.RespectCloseHotkey = false;
-        }
+        this.IsOpen = true;
+        this.RespectCloseHotkey = false;
+    }
 
-        public override void PreDraw()
+    public override void PreDraw()
+    {
+        this.SizeConstraints = new()
         {
-            this.SizeConstraints = new()
-            {
-                MinimumSize = new(ImGuiHelpers.MainViewport.Size.X, 0),
-                MaximumSize = new(0, float.MaxValue)
-            };
-        }
+            MinimumSize = new(ImGuiHelpers.MainViewport.Size.X, 0),
+            MaximumSize = new(0, float.MaxValue)
+        };
+    }
 
-        public override void Draw()
+    public override void Draw()
+    {
+        CImGui.igBringWindowToDisplayBack(CImGui.igGetCurrentWindow());
+        if (ImGui.IsWindowHovered())
         {
-            CImGui.igBringWindowToDisplayBack(CImGui.igGetCurrentWindow());
-            if (ImGui.IsWindowHovered())
+            ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            ImGui.SetTooltip("右键中止所有任务");
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
             {
-                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-                ImGui.SetTooltip("右键中止所有任务");
-                if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
-                {
-                    P.TaskManager.Abort();
-                }
+                P.TaskManager.Abort();
+                P.followPath?.Stop();
             }
-            var percent = 1f - (float)P.TaskManager.NumQueuedTasks / (float)P.TaskManager.MaxTasks;
-            ImGui.PushStyleColor(ImGuiCol.PlotHistogram, EColor.Violet);
-            ImGui.ProgressBar(percent, new(ImGui.GetContentRegionAvail().X, 20));
-            ImGui.PopStyleColor();
-            this.Position = new(0, ImGuiHelpers.MainViewport.Size.Y - ImGui.GetWindowSize().Y);
         }
-
-        public override bool DrawConditions()
+        float percent;
+        Vector4 col;
+        string overlay;
+        if(P.followPath != null && P.followPath.Waypoints.Count > 0)
         {
-            return P.TaskManager.IsBusy && P.TaskManager.MaxTasks > 0 && !P.Config.NoProgressBar;
+            percent = 1f - (float)P.FollowPath.Waypoints.Count / (float)P.FollowPath.MaxWaypoints;
+            col = GradientColor.Get(EColor.Red, EColor.Violet);
+            overlay = $"Lifestream Movement: {P.FollowPath.MaxWaypoints - P.FollowPath.Waypoints.Count}/{P.FollowPath.MaxWaypoints}";
+            if (Splatoon.IsConnected())
+            {
+                P.SplatoonManager.RenderPath(P.FollowPath.Waypoints);
+            }
         }
+        else
+        {
+            percent = 1f - (float)P.TaskManager.NumQueuedTasks / (float)P.TaskManager.MaxTasks;
+            col = EColor.Violet;
+            overlay = $"Lifestream Progress: {P.TaskManager.MaxTasks - P.TaskManager.NumQueuedTasks}/{P.TaskManager.MaxTasks}";
+        }
+        ImGui.PushStyleColor(ImGuiCol.PlotHistogram, col);
+        ImGui.ProgressBar(percent, new(ImGui.GetContentRegionAvail().X, 20), overlay);
+        ImGui.PopStyleColor();
+        this.Position = new(0, ImGuiHelpers.MainViewport.Size.Y - ImGui.GetWindowSize().Y);
+    }
+
+    public override bool DrawConditions()
+    {
+        //return ((P.TaskManager.IsBusy && P.TaskManager.MaxTasks > 0)) && !P.Config.NoProgressBar;
+        return ((P.TaskManager.IsBusy && P.TaskManager.MaxTasks > 0) || (P.followPath != null && P.followPath.Waypoints.Count > 0)) && !P.Config.NoProgressBar;
     }
 }

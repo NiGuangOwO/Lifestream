@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Lifestream.Enums;
 
-namespace Lifestream.Enums
+public enum BasePositionVertical
 {
-    public enum BasePositionVertical
-    {
-        Middle, Top, Bottom
-    }
+    Middle, Top, Bottom
 }

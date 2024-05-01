@@ -2,11 +2,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Authors>NightmareXIV</Authors>
-        <Version>2.0.1.6</Version>
+        <Version>2.1.0.7</Version>
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net7.0-windows</TargetFramework>
+        <TargetFramework>net8.0-windows7.0</TargetFramework>
         <Platforms>x64</Platforms>
         <LangVersion>preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -37,6 +37,9 @@
       <ProjectReference Include="..\..\moewcorp\AutoRetainerAPI\AutoRetainerAPI\AutoRetainerAPI.csproj" />
       <ProjectReference Include="..\..\moewcorp\ClickLib\ClickLib\ClickLib.csproj" />
       <ProjectReference Include="..\..\moewcorp\ECommons\ECommons\ECommons.csproj" />
+      <ProjectReference Include="..\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper\NightmareUI.OtterGuiWrapper.csproj" />
+      <ProjectReference Include="..\NightmareUI\NightmareUI\NightmareUI.csproj" />
+      <ProjectReference Include="..\OtterGui\OtterGui.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -81,6 +84,9 @@
     <ItemGroup>
         <None Update="$(MSBuildProjectName).json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="HousingData.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="StaticData.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

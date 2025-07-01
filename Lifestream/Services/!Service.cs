@@ -38,7 +38,7 @@ public static class Service
     public static Memory Memory;
     public static TeleportService TeleportService;
     public static InstanceHandler InstanceHandler;
-    public static ContextMenuManager ContextMenuManager;
+    //public static ContextMenuManager ContextMenuManager;
     public static AddressBookFileSystemManager AddressBookFileSystemManager;
     public static CustomAliasFileSystemManager CustomAliasFileSystemManager;
     public static HttpClientProvider HttpClientProvider;

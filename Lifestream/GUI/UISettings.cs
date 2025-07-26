@@ -145,6 +145,13 @@ internal static unsafe class UISettings
         {
             ImGuiEx.Text($"在聊天中输入 Lifestream 命令时建议自动完成");
             ImGui.Checkbox("启用", ref C.EnableAutoCompletion);
+            ImGui.Checkbox("在固定位置显示弹出窗口", ref C.AutoCompletionFixedWindow);
+            ImGui.Indent();
+            ImGui.SetNextItemWidth(200f.Scale());
+            ImGui.DragFloat2("位置", ref C.AutoCompletionWindowOffset, 1f);
+            ImGuiEx.RadioButtonBool("从底部", "从顶部", ref C.AutoCompletionWindowBottom, sameLine: true, inverted: true);
+            ImGuiEx.RadioButtonBool("从右侧", "从左侧", ref C.AutoCompletionWindowRight, sameLine: true, inverted: true);
+            ImGui.Unindent();
         })
 
         //.Section("跨大区")

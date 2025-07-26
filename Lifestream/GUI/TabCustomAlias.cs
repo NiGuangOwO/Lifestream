@@ -16,7 +16,7 @@ public static class TabCustomAlias
     public static void Draw()
     {
         var selector = S.CustomAliasFileSystemManager.FileSystem.Selector;
-        selector.Draw(150f);
+        selector.Draw(150f.Scale());
         ImGui.SameLine();
         if(ImGui.BeginChild("Child"))
         {
@@ -362,6 +362,10 @@ public static class TabCustomAlias
             {
                 command.DataID = Svc.Targets.Target.DataId;
             }
+        }
+        if(command.Kind == CustomAliasKind.Mount_Up)
+        {
+            ImGui.Checkbox("Only mount up if enabled in configuration", ref command.MountUpConditional);
         }
         if(command.Kind.EqualsAny(CustomAliasKind.Select_Yes, CustomAliasKind.Select_List_Option))
         {

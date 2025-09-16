@@ -9,7 +9,6 @@ using NightmareUI;
 using NightmareUI.Censoring;
 using NightmareUI.PrimaryUI;
 using System.Globalization;
-using TerraFX.Interop.Windows;
 using Action = System.Action;
 
 namespace Lifestream.GUI;
@@ -38,7 +37,7 @@ internal static unsafe class UISettings
             ImGuiEx.EnumCombo($"跨服传送水晶", ref C.WorldChangeAetheryte, Lang.WorldChangeAetherytes);
             ImGuiEx.HelpMarker($"你想传送到哪里来跨服");
             ImGui.Checkbox($"访问 服务器/大区 后传送到特定的以太网目的地", ref C.WorldVisitTPToAethernet);
-            if(C.WorldVisitTPToAethernet)
+            if (C.WorldVisitTPToAethernet)
             {
                 ImGui.Indent();
                 ImGui.SetNextItemWidth(250f.Scale());
@@ -76,15 +75,16 @@ internal static unsafe class UISettings
             ImGui.SetNextItemWidth(150f.Scale());
             ImGuiEx.EnumCombo("当传送到自己/部队房屋时，执行此操作", ref C.HouseEnterMode);
             ImGui.SetNextItemWidth(150f.Scale());
-            if(ImGui.BeginCombo("首选旅馆", Utils.GetInnNameFromTerritory(C.PreferredInn), ImGuiComboFlags.HeightLarge))
+            if (ImGui.BeginCombo("首选旅馆", Utils.GetInnNameFromTerritory(C.PreferredInn), ImGuiComboFlags.HeightLarge))
             {
-                foreach(var x in (uint[])[0, .. TaskPropertyShortcut.InnData.Keys])
+                foreach (var x in (uint[])[0, .. TaskPropertyShortcut.InnData.Keys])
                 {
-                    if(ImGui.Selectable(Utils.GetInnNameFromTerritory(x), x == C.PreferredInn)) C.PreferredInn = x;
+                    if (ImGui.Selectable(Utils.GetInnNameFromTerritory(x), x == C.PreferredInn))
+                        C.PreferredInn = x;
                 }
                 ImGui.EndCombo();
             }
-            if(Player.CID != 0)
+            if (Player.CID != 0)
             {
                 ImGui.SetNextItemWidth(150f.Scale());
                 var pref = C.PreferredSharedEstates.SafeSelect(Player.CID);
@@ -94,19 +94,19 @@ internal static unsafe class UISettings
                     (-1, 0, 0) => "禁用",
                     _ => $"{ExcelTerritoryHelper.GetName((uint)pref.Territory)}, {pref.Ward}区, {pref.Plot}号"
                 };
-                if(ImGui.BeginCombo($"首选 {Player.NameWithWorld} 的共享房屋", name))
+                if (ImGui.BeginCombo($"首选 {Player.NameWithWorld} 的共享房屋", name))
                 {
-                    foreach(var x in Svc.AetheryteList.Where(x => x.IsSharedHouse))
+                    foreach (var x in Svc.AetheryteList.Where(x => x.IsSharedHouse))
                     {
-                        if(ImGui.RadioButton("第一个可用", pref == default))
+                        if (ImGui.RadioButton("第一个可用", pref == default))
                         {
                             C.PreferredSharedEstates.Remove(Player.CID);
                         }
-                        if(ImGui.RadioButton("禁用", pref == (-1, 0, 0)))
+                        if (ImGui.RadioButton("禁用", pref == (-1, 0, 0)))
                         {
                             C.PreferredSharedEstates[Player.CID] = (-1, 0, 0);
                         }
-                        if(ImGui.RadioButton($"{ExcelTerritoryHelper.GetName(x.TerritoryId)}, {x.Ward}区, {x.Plot}号", pref == ((int)x.TerritoryId, x.Ward, x.Plot)))
+                        if (ImGui.RadioButton($"{ExcelTerritoryHelper.GetName(x.TerritoryId)}, {x.Ward}区, {x.Plot}号", pref == ((int)x.TerritoryId, x.Ward, x.Plot)))
                         {
                             C.PreferredSharedEstates[Player.CID] = ((int)x.TerritoryId, x.Ward, x.Plot);
                         }
@@ -118,24 +118,24 @@ internal static unsafe class UISettings
             ImGuiEx.Text("\"/li auto\" 命令优先级:");
             var prio = C.PropertyPrio;
             var custom = C.PropertyPrioOverrides.TryGetValue(Player.CID, out var value);
-            if(custom)
+            if (custom)
             {
                 prio = value;
             }
 
-            if(Player.Available)
+            if (Player.Available)
             {
                 ImGuiEx.Text($"For {Censor.Character(Player.NameWithWorld)}:");
                 ImGui.Indent();
-                if(ImGui.RadioButton("Use Global Settings", !custom))
+                if (ImGui.RadioButton("Use Global Settings", !custom))
                 {
                     C.PropertyPrioOverrides.Remove(Player.CID);
                 }
                 ImGui.SameLine();
 
-                if(ImGui.RadioButton("Use Individual Settings", custom))
+                if (ImGui.RadioButton("Use Individual Settings", custom))
                 {
-                    if(!custom)
+                    if (!custom)
                     {
                         C.PropertyPrioOverrides[Player.CID] = [];
                     }
@@ -147,16 +147,16 @@ internal static unsafe class UISettings
                 ImGuiEx.TextV($"Editing Global Settings:");
             }
             ImGui.SameLine();
-            if(ImGuiEx.IconButton($"\uf2ea"))
+            if (ImGuiEx.IconButton($"\uf2ea"))
             {
                 prio.Clear();
             }
             ImGuiEx.Tooltip("Reset to default order");
 
             var dragDrop = Ref<ImGuiEx.RealtimeDragDrop<AutoPropertyData>>.Get(() => new("apddd", x => x.Type.ToString()));
-            prio.AddRange(Enum.GetValues<TaskPropertyShortcut.PropertyType>().Where(x => x != TaskPropertyShortcut.PropertyType.Auto && !prio.Any(s => s.Type == x)).Select(x => new AutoPropertyData(false, x)));
+            prio.AddRange(Enum.GetValues<TaskPropertyShortcut.PropertyType>().Where(x => x != TaskPropertyShortcut.PropertyType.自动 && !prio.Any(s => s.Type == x)).Select(x => new AutoPropertyData(false, x)));
             dragDrop.Begin();
-            for(var i = 0; i < prio.Count; i++)
+            for (var i = 0; i < prio.Count; i++)
             {
                 var d = prio[i];
                 ImGui.PushID($"c{i}");
@@ -241,61 +241,61 @@ internal static unsafe class UISettings
             var anyChanged = ImGui.Checkbox("启用 Wotsit 集成以传送至以太网目的地", ref C.WotsitIntegrationEnabled);
             ImGuiEx.PluginAvailabilityIndicator([new("Dalamud.FindAnything", "Wotsit")]);
 
-            if(C.WotsitIntegrationEnabled)
+            if (C.WotsitIntegrationEnabled)
             {
                 ImGui.Indent();
-                if(ImGui.Checkbox("包括服务器选择窗口", ref C.WotsitIntegrationIncludes.WorldSelect))
+                if (ImGui.Checkbox("包括服务器选择窗口", ref C.WotsitIntegrationIncludes.WorldSelect))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括自动传送至房产", ref C.WotsitIntegrationIncludes.PropertyAuto))
+                if (ImGui.Checkbox("包括自动传送至房产", ref C.WotsitIntegrationIncludes.PropertyAuto))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括传送至个人房屋", ref C.WotsitIntegrationIncludes.PropertyPrivate))
+                if (ImGui.Checkbox("包括传送至个人房屋", ref C.WotsitIntegrationIncludes.PropertyPrivate))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括传送至部队房屋", ref C.WotsitIntegrationIncludes.PropertyFreeCompany))
+                if (ImGui.Checkbox("包括传送至部队房屋", ref C.WotsitIntegrationIncludes.PropertyFreeCompany))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括传送至公寓", ref C.WotsitIntegrationIncludes.PropertyApartment))
+                if (ImGui.Checkbox("包括传送至公寓", ref C.WotsitIntegrationIncludes.PropertyApartment))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括传送至旅馆房间", ref C.WotsitIntegrationIncludes.PropertyInn))
+                if (ImGui.Checkbox("包括传送至旅馆房间", ref C.WotsitIntegrationIncludes.PropertyInn))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括传送至大国防联军", ref C.WotsitIntegrationIncludes.GrandCompany))
+                if (ImGui.Checkbox("包括传送至大国防联军", ref C.WotsitIntegrationIncludes.GrandCompany))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括传送至市场板", ref C.WotsitIntegrationIncludes.MarketBoard))
+                if (ImGui.Checkbox("包括传送至市场板", ref C.WotsitIntegrationIncludes.MarketBoard))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括传送至无人岛", ref C.WotsitIntegrationIncludes.IslandSanctuary))
+                if (ImGui.Checkbox("包括传送至无人岛", ref C.WotsitIntegrationIncludes.IslandSanctuary))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括自动传送至以太网目的地", ref C.WotsitIntegrationIncludes.AetheryteAethernet))
+                if (ImGui.Checkbox("包括自动传送至以太网目的地", ref C.WotsitIntegrationIncludes.AetheryteAethernet))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括地址簿条目", ref C.WotsitIntegrationIncludes.AddressBook))
+                if (ImGui.Checkbox("包括地址簿条目", ref C.WotsitIntegrationIncludes.AddressBook))
                 {
                     anyChanged = true;
                 }
-                if(ImGui.Checkbox("包括自定义别名", ref C.WotsitIntegrationIncludes.CustomAlias))
+                if (ImGui.Checkbox("包括自定义别名", ref C.WotsitIntegrationIncludes.CustomAlias))
                 {
                     anyChanged = true;
                 }
                 ImGui.Unindent();
             }
 
-            if(anyChanged)
+            if (anyChanged)
             {
                 PluginLog.Debug("Wotsit 集成设置已更改，立即重新初始化");
                 S.Ipc.WotsitManager.TryClearWotsit();
@@ -313,7 +313,7 @@ internal static unsafe class UISettings
         .Widget(() =>
         {
             ImGui.Checkbox("启用悬浮窗", ref C.Enable);
-            if(C.Enable)
+            if (C.Enable)
             {
                 ImGui.Indent();
                 ImGui.Checkbox($"显示城内以太水晶菜单", ref C.ShowAethernet);
@@ -323,7 +323,7 @@ internal static unsafe class UISettings
                 UtilsUI.NextSection();
 
                 ImGui.Checkbox("固定Lifestream悬浮窗位置", ref C.FixedPosition);
-                if(C.FixedPosition)
+                if (C.FixedPosition)
                 {
                     ImGui.Indent();
                     ImGui.SetNextItemWidth(200f.Scale());
@@ -339,8 +339,8 @@ internal static unsafe class UISettings
                 UtilsUI.NextSection();
 
                 ImGui.SetNextItemWidth(100f.Scale());
-                fixed(int* ptr = &C.ButtonWidthArray[0])
-                fixed(byte* sptr = "按钮左/右内边距\0"u8)
+                fixed (int* ptr = &C.ButtonWidthArray[0])
+                fixed (byte* sptr = "按钮左/右内边距\0"u8)
                 {
                     ImGuiNative.InputInt3(sptr, ptr, ImGuiInputTextFlags.None);
                 }
@@ -351,7 +351,7 @@ internal static unsafe class UISettings
                 ImGui.Unindent();
 
                 ImGui.Checkbox("按钮上的文本左对齐", ref C.LeftAlignButtons);
-                if(C.LeftAlignButtons)
+                if (C.LeftAlignButtons)
                 {
                     ImGui.SetNextItemWidth(100f);
                     ImGui.DragInt("左内边距，空格", ref C.LeftAlignPadding, 0.1f, 0, 20);
@@ -365,7 +365,7 @@ internal static unsafe class UISettings
         .Checkbox("切换副本区前飞行时返回地面", () => ref C.EnableFlydownInstance)
         .Widget("在服务器信息栏显示副本区编号", (x) =>
         {
-            if(ImGui.Checkbox(x, ref C.EnableDtrBar))
+            if (ImGui.Checkbox(x, ref C.EnableDtrBar))
             {
                 S.DtrManager.Refresh();
             }
@@ -373,7 +373,7 @@ internal static unsafe class UISettings
         .SliderInt(150f, "额外按钮高度", () => ref C.InstanceButtonHeight, 0, 50)
         .Widget("重置副本区数据", (x) =>
         {
-            if(ImGuiEx.Button(x, C.PublicInstances.Count > 0))
+            if (ImGuiEx.Button(x, C.PublicInstances.Count > 0))
             {
                 C.PublicInstances.Clear();
                 EzConfig.Save();
@@ -385,7 +385,7 @@ internal static unsafe class UISettings
         .If(() => C.HideAddon)
         .Widget(() =>
         {
-            if(ImGui.BeginTable("HideAddonTable", 2, ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.BordersOuter | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
+            if (ImGui.BeginTable("HideAddonTable", 2, ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.BordersOuter | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
             {
                 ImGui.TableSetupColumn("col1", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn("col2");
@@ -395,7 +395,7 @@ internal static unsafe class UISettings
                 ImGuiEx.SetNextItemFullWidth();
                 ImGui.InputTextWithHint("##addnew", "窗口名称... /xldata ai - 来查找", ref AddNew, 100);
                 ImGui.TableNextColumn();
-                if(ImGuiEx.IconButton(FontAwesomeIcon.Plus))
+                if (ImGuiEx.IconButton(FontAwesomeIcon.Plus))
                 {
                     C.HideAddonList.Add(AddNew);
                     AddNew = "";
@@ -404,26 +404,29 @@ internal static unsafe class UISettings
                 List<string> focused = [];
                 try
                 {
-                    foreach(var x in RaptureAtkUnitManager.Instance()->FocusedUnitsList.Entries)
+                    foreach (var x in RaptureAtkUnitManager.Instance()->FocusedUnitsList.Entries)
                     {
-                        if(x.Value == null) continue;
+                        if (x.Value == null)
+                            continue;
                         focused.Add(x.Value->NameString);
                     }
                 }
-                catch(Exception e) { e.Log(); }
+                catch (Exception e) { e.Log(); }
 
-                if(focused != null)
+                if (focused != null)
                 {
-                    foreach(var name in focused)
+                    foreach (var name in focused)
                     {
-                        if(name == null) continue;
-                        if(C.HideAddonList.Contains(name)) continue;
+                        if (name == null)
+                            continue;
+                        if (C.HideAddonList.Contains(name))
+                            continue;
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
                         ImGuiEx.TextV(EColor.Green, $"Focused: {name}");
                         ImGui.TableNextColumn();
                         ImGui.PushID(name);
-                        if(ImGuiEx.IconButton(FontAwesomeIcon.Plus))
+                        if (ImGuiEx.IconButton(FontAwesomeIcon.Plus))
                         {
                             C.HideAddonList.Add(name);
                         }
@@ -437,14 +440,14 @@ internal static unsafe class UISettings
                 ImGui.TableNextColumn();
                 ImGui.Dummy(new Vector2(5f));
 
-                foreach(var s in C.HideAddonList)
+                foreach (var s in C.HideAddonList)
                 {
                     ImGui.PushID(s);
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGuiEx.TextV(focused.Contains(s) ? EColor.Green : null, s);
                     ImGui.TableNextColumn();
-                    if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
                     {
                         new TickScheduler(() => C.HideAddonList.Remove(s));
                     }
@@ -457,23 +460,23 @@ internal static unsafe class UISettings
         .EndIf()
         .Draw();
 
-        if(C.Hidden.Count > 0)
+        if (C.Hidden.Count > 0)
         {
             new NuiBuilder()
             .Section("隐藏城内水晶")
             .Widget(() =>
             {
                 uint toRem = 0;
-                foreach(var x in C.Hidden)
+                foreach (var x in C.Hidden)
                 {
                     ImGuiEx.Text($"{Svc.Data.GetExcelSheet<Aetheryte>().GetRowOrDefault(x)?.AethernetName.ValueNullable?.Name.ToString() ?? x.ToString()}");
                     ImGui.SameLine();
-                    if(ImGui.SmallButton($"删除##{x}"))
+                    if (ImGui.SmallButton($"删除##{x}"))
                     {
                         toRem = x;
                     }
                 }
-                if(toRem > 0)
+                if (toRem > 0)
                 {
                     C.Hidden.Remove(toRem);
                 }
@@ -490,7 +493,7 @@ internal static unsafe class UISettings
         {
             ImGui.Checkbox($"减慢城内以太水晶传送速度", ref C.SlowTeleport);
             ImGuiEx.HelpMarker($"将城内以太水晶传送速度减慢指定的量。");
-            if(C.SlowTeleport)
+            if (C.SlowTeleport)
             {
                 ImGui.Indent();
                 ImGui.SetNextItemWidth(200f.Scale());

@@ -15,7 +15,9 @@ public class IPCProvider
 {
     private IPCProvider()
     {
-        EzIPC.Init(this, reducedLogging: true);
+        ECommonsMain.ReducedLogging = true;
+        EzIPC.Init(this);
+        ECommonsMain.ReducedLogging = false;
     }
 
     [EzIPC]
@@ -57,7 +59,7 @@ public class IPCProvider
     [EzIPC]
     public bool IsBusy()
     {
-        return P.TaskManager.IsBusy || (P.followPath != null && P.followPath.Waypoints.Count > 0);
+        return P.TaskManager.IsBusy || (P.followPath != null && P.FollowPath.Waypoints.Count > 0);
     }
 
     [EzIPC]
@@ -276,6 +278,18 @@ public class IPCProvider
     }
 
     [EzIPC]
+    public HousePathData GetSharedHousePathData()
+    {
+        var e = TaskPropertyShortcut.GetSharedHouseAetheryteId(out var entry);
+        if(e.ID != 0)
+        {
+            var data = Utils.GetCustomPathData(Utils.GetResidentialAetheryteByTerritoryType(entry.TerritoryId).Value, entry.Ward - 1, entry.Plot - 1);
+            return data;
+        }
+        return null;
+    }
+
+    [EzIPC]
     public uint GetResidentialTerritory(ResidentialAetheryteKind r)
     {
         return r.GetResidentialTerritory();
@@ -358,6 +372,13 @@ public class IPCProvider
     {
         if(Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId) return null;
         return TaskPropertyShortcut.GetPrivateHouseAetheryteID() != 0;
+    }
+
+    [EzIPC]
+    public bool? HasSharedEstate()
+    {
+        if(Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId) return null;
+        return TaskPropertyShortcut.GetSharedHouseAetheryteId(out _).ID != 0;
     }
 
     [EzIPC]
@@ -444,6 +465,34 @@ public class IPCProvider
         ConnectAndOpenCharaSelect(charaName, charaHomeWorld);
         P.TaskManager.Enqueue(() => IpcUtils.InitiateTravelFromCharaSelectScreenInternal(charaName, charaHomeWorld, destination, noLogin));
         return true;
+    }
+
+    [EzIPC]
+    public bool InitiateLoginFromCharaSelectScreen(string charaName, string charaHomeWorld)
+    {
+        if(IsBusy())
+        {
+            return false;
+        }
+        return IpcUtils.InitiateLoginFromCharaSelectScreenInternal(charaName, charaHomeWorld);
+    }
+
+    [EzIPC]
+    public bool ConnectAndLogin(string charaName, string charaHomeWorld)
+    {
+        if(IsBusy() || !CanAutoLogin())
+        {
+            return false;
+        }
+        ConnectAndOpenCharaSelect(charaName, charaHomeWorld);
+        P.TaskManager.Enqueue(() => IpcUtils.InitiateLoginFromCharaSelectScreenInternal(charaName, charaHomeWorld));
+        return true;
+    }
+
+    [EzIPC]
+    public void EnqueueCustomAlias(CustomAlias alias, bool force, int? inclusiveStart, int? inclusiveEnd)
+    {
+        alias.Enqueue(force, inclusiveStart, inclusiveEnd);
     }
 
     [EzIPCEvent] public System.Action OnHouseEnterError;

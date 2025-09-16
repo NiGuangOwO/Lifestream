@@ -278,6 +278,7 @@ public static unsafe class UIHouseReg
                     {
                         new TickScheduler(() => C.CustomHousePathDatas.Remove(data));
                     }
+                    ImGuiEx.Tooltip("Hold CTRL and click");
                     DrawHousingData_DrawPath(data, false, kind, ward, plot);
                 }
             }
@@ -321,6 +322,7 @@ public static unsafe class UIHouseReg
             {
                 C.HousePathDatas.Remove(data);
             }
+            ImGuiEx.Tooltip("按住 CTRL 并单击");
             ImGui.Checkbox("传送后的行为", ref data.EnableHouseEnterModeOverride);
             if(data.EnableHouseEnterModeOverride)
             {
@@ -461,6 +463,7 @@ public static unsafe class UIHouseReg
                     var toRem = i;
                     new TickScheduler(() => path.RemoveAt(toRem));
                 }
+                ImGuiEx.Tooltip("Hold CTRL and click");
                 Visualise();
                 ImGui.PopID();
 

@@ -222,7 +222,7 @@ public static unsafe class TabAddressBook
                     }
                     if(entry.Alias != "")
                     {
-                        ImGui.MenuItem($"Enable Alias: {entry.Alias}", null, ref entry.AliasEnabled);
+                        ImGui.MenuItem($"Enable Alias: {entry.Alias}", ref entry.AliasEnabled);
                     }
                     if(ImGui.MenuItem("编辑..."))
                     {

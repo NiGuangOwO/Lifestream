@@ -27,6 +27,7 @@ using Lifestream.Tasks.Utility;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 using NightmareUI.ImGuiElements;
+using Callback = ECommons.Automation.Callback;
 using Path = System.IO.Path;
 
 namespace Lifestream.GUI;
@@ -340,6 +341,13 @@ internal static unsafe class UIDebug
 
     private static void Debug()
     {
+        if(ImGui.CollapsingHeader("Image test"))
+        {
+            if(ThreadLoadImageHandler.TryGetTextureWrap("https://github.com/FFXIV-CombatReborn/RotationSolverReborn/blob/main/Images/Logo.png?raw=true", out var tex))
+            {
+                ImGui.Image(tex.Handle, new(-1));
+            }
+        }
         if(ImGui.CollapsingHeader("IPC test - travel from chara select screen"))
         {
             ref var name = ref Ref<string>.Get("name");
@@ -355,6 +363,8 @@ internal static unsafe class UIDebug
             if(ImGui.Button("ConnectAndOpenCharaSelect")) DuoLog.Information($"{S.Ipc.IPCProvider.ConnectAndOpenCharaSelect(name, world)}");
             if(ImGui.Button("InitiateTravelFromCharaSelectScreen")) DuoLog.Information($"{S.Ipc.IPCProvider.InitiateTravelFromCharaSelectScreen(name, world, dest, nologin)}");
             if(ImGui.Button("ConnectAndTravel")) DuoLog.Information($"{S.Ipc.IPCProvider.ConnectAndTravel(name, world, dest, nologin)}");
+            if(ImGui.Button("ConnectAndLogin")) DuoLog.Information($"{S.Ipc.IPCProvider.ConnectAndLogin(name, world)}");
+            if(ImGui.Button("InitiateLoginFromCharaSelectScreen")) DuoLog.Information($"{S.Ipc.IPCProvider.InitiateLoginFromCharaSelectScreen(name, world)}");
         }
         if(ImGui.CollapsingHeader("ApproachConditionIsMet"))
         {
@@ -596,12 +606,12 @@ internal static unsafe class UIDebug
             for(var i = 0; i < hud->MapMarkers.Count; i++)
             {
                 var marker = hud->MapMarkers[i];
-                var pos = new Vector3(marker.X, marker.Y, marker.Z);
+                var pos = new Vector3(marker.Position.X, marker.Position.Y, marker.Position.Z);
                 ImGuiEx.Text($"Marker {marker.IconId}, pos: {pos:F1}, distance: {Vector3.Distance(Player.Position, pos):f1}");
                 if(ThreadLoadImageHandler.TryGetIconTextureWrap(marker.IconId, false, out var w))
                 {
                     ImGui.SameLine();
-                    ImGui.Image(w.ImGuiHandle, new(30f));
+                    ImGui.Image(w.Handle, new(30f));
                 }
             }
         }
@@ -723,7 +733,7 @@ internal static unsafe class UIDebug
             if(TryGetAddonByName<AddonSelectString>("SelectString", out var addon))
             {
                 ImGuiEx.Text($"Entries: {addon->PopupMenu.PopupMenu.EntryCount}");
-                foreach(var entry in new SelectStringMaster(addon).Entries)
+                foreach(var entry in new AddonMaster.SelectString(addon).Entries)
                 {
                     ImGuiEx.Text($"{entry.Text}");
                     if(ImGuiEx.HoveredAndClicked())

@@ -13,15 +13,14 @@ using ECommons.MathHelpers;
 using ECommons.Reflection;
 using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
-using FFXIVClientStructs;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lifestream.Data;
 using Lifestream.Enums;
 using Lifestream.GUI;
-using Lifestream.Systems.Custom;
 using Lifestream.Systems.Legacy;
 using Lifestream.Systems.Residential;
 using Lifestream.Tasks.CrossDC;
@@ -29,20 +28,158 @@ using Lifestream.Tasks.SameWorld;
 using Lumina.Excel.Sheets;
 using Lumina.Text.ReadOnly;
 using NightmareUI;
-using PInvoke;
-using System;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static FFXIVClientStructs.FFXIV.Client.UI.AddonAirShipExploration;
-using Action = System.Action;
+using TerraFX.Interop.Windows;
 using CharaData = (string Name, ushort World);
+using Control = FFXIVClientStructs.FFXIV.Client.Game.Control.Control;
+using FXWindows = TerraFX.Interop.Windows.Windows;
 
 namespace Lifestream;
 
 internal static unsafe partial class Utils
 {
     public static string[] LifestreamNativeCommands = ["auto", "home", "house", "private", "fc", "free", "company", "free company", "apartment", "apt", "shared", "inn", "hinn", "gc", "gcc", "hc", "hcc", "fcgc", "gcfc", "mb", "market", "island", "is", "sanctuary", "cosmic", "ardorum", "moon", "tp"];
+
+    public static bool IsInnUnlocked()
+    {
+        var q = UIState.Instance();
+        foreach(var x in (uint[])[65665, 66005, 65856])
+        {
+            if(q->IsUnlockLinkUnlockedOrQuestCompleted(x)) return true;
+        }
+        return false;
+    }
+
+    public static List<(Vector3 Start, Vector3 End)> GenerateGroupConnectionLines(this CustomAlias alias, float extraScatter = 0f)
+    {
+        var commands = alias.Commands;
+        List<(Vector3 Start, Vector3 End)> lines = new();
+
+        var grouped = commands
+            .Where(c => c.ChainGroup > 0)
+            .GroupBy(c => c.ChainGroup)
+            .OrderBy(g => g.Key);
+
+        foreach(var group in grouped)
+        {
+            var groupCommands = group.ToList(); 
+            if(!groupCommands[0].Territory.EqualsAny<uint>(0, Player.Territory)) continue;
+
+            Vector3? previousPoint = null;
+            float previousRadius = 0f;
+
+            int i = 0;
+
+            if(groupCommands[0].Kind == CustomAliasKind.Circular_movement && groupCommands[0].WalkToExit)
+            {
+                previousPoint = groupCommands[0].CircularExitPoint;
+                previousRadius = groupCommands[0].Scatter + extraScatter;
+                i = 1;
+            }
+            else
+            {
+                while(i < groupCommands.Count)
+                {
+                    var cmd = groupCommands[i];
+                    if(cmd.Kind != CustomAliasKind.Circular_movement)
+                    {
+                        previousPoint = cmd.Point;
+                        previousRadius = cmd.Scatter + extraScatter;
+                        i++;
+                        break;
+                    }
+                    i++;
+                }
+            }
+
+            if(!previousPoint.HasValue)
+            {
+                continue;
+            }
+
+            for(; i < groupCommands.Count; i++)
+            {
+                var current = groupCommands[i];
+
+                if(current.Kind == CustomAliasKind.Circular_movement)
+                {
+                    continue;
+                }
+
+                var currentPoint = current.Point;
+                float currentRadius = current.Scatter + extraScatter;
+
+                Vector3 dir = Vector3.Normalize(currentPoint - previousPoint.Value);
+                Vector3 right = Vector3.Normalize(Vector3.Cross(dir, Vector3.UnitY));
+
+                if(previousRadius == 0f && currentRadius == 0f)
+                {
+                    lines.Add((previousPoint.Value, currentPoint));
+                }
+                else
+                {
+                    Vector3 prevA = previousPoint.Value + right * previousRadius;
+                    Vector3 prevB = previousPoint.Value - right * previousRadius;
+
+                    Vector3 currA = currentPoint + right * currentRadius;
+                    Vector3 currB = currentPoint - right * currentRadius;
+
+                    lines.Add((prevA, currA));
+                    lines.Add((prevB, currB));
+                }
+
+                previousPoint = currentPoint;
+                previousRadius = currentRadius;
+            }
+        }
+
+        return lines;
+    }
+
+    public static bool IsChainedWithNext(this CustomAlias alias, int index)
+    {
+        if(index < 0 || index >= alias.Commands.Count - 1)
+        {
+            return false;
+        }
+        var current = alias.Commands[index];
+        if(current.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point, CustomAliasKind.Circular_movement))
+        {
+            var next = alias.Commands[index + 1];
+
+            if(next.Kind == CustomAliasKind.Move_to_point)
+            {
+                return current.Territory == 0 || next.Territory == 0 || current.Territory == next.Territory;
+            }
+        }
+        return false;
+    }
+
+    public static void CopyTerritoryRange(this CustomAlias alias, int currentIndex, int rangeOneBased)
+    {
+        var commands = alias.Commands;
+        if(commands.Count == 0 || currentIndex < 0 || currentIndex >= commands.Count)
+        {
+            return;
+        }
+
+        var range = rangeOneBased - 1;
+
+        var start = Math.Min(currentIndex, range);
+        var end = Math.Max(currentIndex, range);
+
+        var territory = commands[currentIndex].Territory;
+
+        for(var i = start; i <= end; i++)
+        {
+            if(i >= 0 && i < commands.Count)
+            {
+                commands[i].Territory = territory;
+            }
+        }
+    }
 
     public static Vector3 Scatter(this Vector3 point, float radius)
     {
@@ -554,9 +691,9 @@ internal static unsafe partial class Utils
             if(WindowFunctions.TryFindGameWindow(out var hwnd))
             {
                 var point = new POINT() { x = x, y = y };
-                if(User32.ClientToScreen(hwnd, ref point))
+                if(FXWindows.ClientToScreen(hwnd, &point))
                 {
-                    User32.SetCursorPos(point.x, point.y);
+                    FXWindows.SetCursorPos(point.x, point.y);
                 }
                 break;
             }
@@ -574,27 +711,57 @@ internal static unsafe partial class Utils
             value = Player.Position.ToVector2();
         }
         ImGuiEx.Tooltip("To player positon");
-        ImGui.SameLine();
+        ImGui.SameLine(0, 1);
         if(ImGuiEx.IconButton(FontAwesomeIcon.Crosshairs, $"target{id}", enabled: Svc.Targets.Target != null))
         {
             value = Svc.Targets.Target.Position.ToVector2();
         }
         ImGuiEx.Tooltip("To target positon");
-        ImGui.SameLine();
+        ImGui.SameLine(0, 1);
         if(ImGuiEx.IconButton(FontAwesomeIcon.MousePointer, $"target{id}", enabled: Player.Interactable))
         {
             BeginScreenToWorldSelection(id, value);
         }
         ScreenToWorldSelector(id, ref value);
         ImGuiEx.Tooltip("Select with mouse");
-        ImGui.SameLine();
+        /*ImGui.SameLine(0, 1);
         if(ImGuiEx.IconButton(FontAwesomeIcon.Flag, $"flag{id}", enabled: Player.Interactable && AgentMap.Instance()->IsFlagMarkerSet == true))
         {
             var marker = AgentMap.Instance()->FlagMapMarker;
             value = new(marker.XFloat, marker.YFloat);
-        }
-        ScreenToWorldSelector(id, ref value);
+        }*/
         ImGuiEx.Tooltip("To map flag");
+
+        ImGui.SameLine(0, 1);
+        if(ImGuiEx.IconButton(FontAwesomeIcon.Brush, $"splatoon{id}"))
+        {
+            try
+            {
+                if(DalamudReflector.TryGetDalamudPlugin("Splatoon", out var instance, true, true))
+                {
+                    var element = instance.GetStaticFoP("Splatoon.ConfigGui.CGuiLayouts.LayoutDrawSelector", "CurrentElement");
+                    if(element != null)
+                    {
+                        var v = new Vector3(element.GetFoP<float>("refX"), element.GetFoP<float>("refZ"), element.GetFoP<float>("refY"));
+                        value = v.ToVector2();
+                    }
+                    else
+                    {
+                        Notify.Error("Element is not selected");
+                    }
+                }
+                else
+                {
+                    Notify.Error("Splatoon is not installed");
+                }
+            }
+            catch(Exception e)
+            {
+                e.Log();
+                Notify.Error("An error occurred while retrieving element coordinates");
+            }
+        }
+        ImGuiEx.Tooltip("From selected Splatoon element");
     }
 
     public static void DrawVector3Selector(string id, ref Vector3 value)
@@ -607,27 +774,57 @@ internal static unsafe partial class Utils
             value = Player.Position;
         }
         ImGuiEx.Tooltip("To player positon");
-        ImGui.SameLine();
+        ImGui.SameLine(0, 1);
         if(ImGuiEx.IconButton(FontAwesomeIcon.Crosshairs, $"target{id}", enabled: Svc.Targets.Target != null))
         {
             value = Svc.Targets.Target.Position;
         }
         ImGuiEx.Tooltip("To target positon");
-        ImGui.SameLine();
+        ImGui.SameLine(0, 1);
         if(ImGuiEx.IconButton(FontAwesomeIcon.MousePointer, $"target{id}", enabled: Player.Interactable))
         {
             BeginScreenToWorldSelection(id, value);
         }
         ScreenToWorldSelector(id, ref value);
         ImGuiEx.Tooltip("Select with mouse");
-        ImGui.SameLine();
+        /*ImGui.SameLine(0, 1);
         if(ImGuiEx.IconButton(FontAwesomeIcon.Flag, $"flag{id}", enabled: Player.Interactable && AgentMap.Instance()->IsFlagMarkerSet == true))
         {
             var marker = AgentMap.Instance()->FlagMapMarker;
             value = new(marker.XFloat, 0, marker.YFloat);
         }
-        ScreenToWorldSelector(id, ref value);
-        ImGuiEx.Tooltip("To map flag");
+        ImGuiEx.Tooltip("To map flag");*/
+
+        ImGui.SameLine(0, 1);
+        if(ImGuiEx.IconButton(FontAwesomeIcon.Brush, $"splatoon{id}"))
+        {
+            try
+            {
+                if(DalamudReflector.TryGetDalamudPlugin("Splatoon", out var instance, true, true))
+                {
+                    var element = instance.GetStaticFoP("Splatoon.ConfigGui.CGuiLayouts.LayoutDrawSelector", "CurrentElement");
+                    if(element != null)
+                    {
+                        var v = new Vector3(element.GetFoP<float>("refX"), element.GetFoP<float>("refZ"), element.GetFoP<float>("refY"));
+                        value = v;
+                    }
+                    else
+                    {
+                        Notify.Error("Element is not selected");
+                    }
+                }
+                else
+                {
+                    Notify.Error("Splatoon is not installed");
+                }
+            }
+            catch(Exception e)
+            {
+                e.Log();
+                Notify.Error("An error occurred while retrieving element coordinates");
+            }
+        }
+        ImGuiEx.Tooltip("From selected Splatoon element");
     }
 
     public static IEnumerable<uint> GetAllRegisteredAethernetDestinations()
@@ -752,10 +949,10 @@ internal static unsafe partial class Utils
 
     public static bool IsBusy()
     {
-        return P.TaskManager.IsBusy || P.followPath?.waypointsInternal.Count > 0;
+        return P.TaskManager.IsBusy || P.followPath?.Waypoints.Count > 0;
     }
 
-    public static bool CanFly() => S.Memory.FlightAddr != 0 && S.Memory.IsFlightProhibited(S.Memory.FlightAddr) == 0;
+    public static bool CanFly() => Control.GetFlightAllowedStatus() == 0;
 
     public static bool TryGetWorldFromDataCenter(string s, out string world, out uint dataCenter)
     {
@@ -1179,6 +1376,34 @@ internal static unsafe partial class Utils
         return null;
     }
 
+    /// <summary>
+    /// Attempts to convert Aetheryte into TinyAetheryte without range check
+    /// </summary>
+    /// <param name="a"></param>
+    /// <returns></returns>
+    public static TinyAetheryte? GetTinyAetheryteFromGameObject(IGameObject a)
+    {
+        if(a != null)
+        {
+            var pos2 = a.Position.ToVector2();
+            foreach(var x in S.Data.DataStore.Aetherytes)
+            {
+                if(x.Key.TerritoryType == P.Territory)
+                {
+                    return x.Key;
+                }
+                foreach(var l in x.Value)
+                {
+                    if(l.TerritoryType == P.Territory)
+                    {
+                        return l ;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     internal static bool IsDisallowedToChangeWorld()
     {
         return Svc.Condition[ConditionFlag.WaitingToVisitOtherWorld]
@@ -1403,7 +1628,7 @@ internal static unsafe partial class Utils
         {
             try
             {
-                var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i);
+                var addon = (AtkUnitBase*)Svc.GameGui.GetAddonByName("SelectYesno", i).Address;
                 if(addon == null) return null;
                 if(IsAddonReady(addon))
                 {

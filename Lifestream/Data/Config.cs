@@ -65,6 +65,7 @@ public class Config : IEzConfig
     public bool UseReturn = true;
     public uint PreferredInn = 0;
     public List<AutoPropertyData> PropertyPrio = [new(true, TaskPropertyShortcut.PropertyType.个人房屋), new(true, TaskPropertyShortcut.PropertyType.部队房屋), new(true, TaskPropertyShortcut.PropertyType.公寓), new(true, TaskPropertyShortcut.PropertyType.旅馆), new(false, TaskPropertyShortcut.PropertyType.共享房屋)];
+    public Dictionary<ulong, List<AutoPropertyData>> PropertyPrioOverrides = [];
     public bool EnableDvcRetry = true;
     public int MaxDcvRetries = 3000;
     public bool DcvUseAlternativeWorld = true;
@@ -96,4 +97,5 @@ public class Config : IEzConfig
     public bool AutoCompletionWindowBottom = false;
     public bool AutoCompletionWindowRight = false;
     public Vector2 AutoCompletionWindowOffset = Vector2.Zero;
+    public bool AutoDismount = true;
 }

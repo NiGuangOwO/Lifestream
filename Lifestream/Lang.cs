@@ -51,9 +51,10 @@ internal static class Lang
 
     -- 其他 --
 
-    /li cosmic → 前往 宇宙探索，别名：/li cosmic|moon|ardorum
+    /li cosmic → 前往 宇宙探索, 别名: /li cosmic|moon|ardorum
     /li island → 前往 无人岛
-    /li w → 打开跨服窗口，别名：/li w|world|open|select
+    /li firmament → - 前往 天穹街
+    /li w → 打开跨服窗口，别名： /li w|world|open|select
     /lifestream → 打开插件配置 
     """;
     internal static string[] AdditionalChambersEntrance =>

@@ -62,6 +62,7 @@ public static class TabMultipath
                 new TickScheduler(() => C.MultiPathes.Remove(Selected));
                 Selected = null;
             }
+            ImGuiEx.Tooltip("Hold CTRL and click");
             ImGui.SameLine();
             if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Copy, "Copy"))
             {
@@ -112,15 +113,7 @@ public static class TabMultipath
                         ImGui.PushID(i);
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();
-                        if(ImGui.ArrowButton("##up", ImGuiDir.Up) && i > 0)
-                        {
-                            (currentPath.Points[i], currentPath.Points[i - 1]) = (currentPath.Points[i - 1], currentPath.Points[i]);
-                        }
-                        ImGui.SameLine(0, 1);
-                        if(ImGui.ArrowButton("##down", ImGuiDir.Down) && i < currentPath.Points.Count - 1)
-                        {
-                            (currentPath.Points[i], currentPath.Points[i + 1]) = (currentPath.Points[i + 1], currentPath.Points[i]);
-                        }
+                        //TODO: delete this
 
                         ImGui.TableNextColumn();
 

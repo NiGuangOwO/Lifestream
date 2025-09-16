@@ -17,7 +17,6 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lifestream.Data;
 using Lifestream.Enums;
-using Lifestream.Game;
 using Lifestream.GUI;
 using Lifestream.GUI.Windows;
 using Lifestream.IPC;
@@ -25,9 +24,7 @@ using Lifestream.Movement;
 using Lifestream.Schedulers;
 using Lifestream.Services;
 using Lifestream.Systems;
-using Lifestream.Systems.Custom;
 using Lifestream.Systems.Legacy;
-using Lifestream.Systems.Residential;
 using Lifestream.Tasks;
 using Lifestream.Tasks.CrossDC;
 using Lifestream.Tasks.CrossWorld;
@@ -35,6 +32,7 @@ using Lifestream.Tasks.SameWorld;
 using Lifestream.Tasks.Shortcuts;
 using Lumina.Excel.Sheets;
 using NotificationMasterAPI;
+using Callback = ECommons.Automation.Callback;
 using GrandCompany = ECommons.ExcelServices.GrandCompany;
 
 namespace Lifestream;
@@ -95,7 +93,7 @@ public unsafe class Lifestream : IDalamudPlugin
             CharaSelectOverlay = new();
             EzConfigGui.WindowSystem.AddWindow(CharaSelectOverlay);
             EzCmd.Add("/lifestream", ProcessCommand, null);
-            EzCmd.Add("/li", ProcessCommand, "\n" + Lang.Help);
+            EzCmd.Add("/li", ProcessCommand, "Return to home world. Type /lifestream and switch to \"Help\" tab for a list of built-in shortcuts.");
             ProperOnLogin.RegisterAvailable(() =>
             {
                 Config.CharaMap[Player.CID] = Player.NameWithWorld;
@@ -213,7 +211,7 @@ public unsafe class Lifestream : IDalamudPlugin
         }
         else if(arguments.EqualsIgnoreCaseAny("ws", "workshop"))
         {
-            TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.部队房屋, workshop: true);
+            TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.部队房屋, HouseEnterMode.进入工房);
         }
         else if(arguments.EqualsIgnoreCaseAny("apartment", "apt"))
         {
@@ -313,6 +311,17 @@ public unsafe class Lifestream : IDalamudPlugin
             if(!Utils.IsBusy())
             {
                 StaticAlias.OccultCrescent.Enqueue(true);
+            }
+            else
+            {
+                Notify.Error("Lifestream is busy");
+            }
+        }
+        else if(arguments.EqualsIgnoreCase("Firmament"))
+        {
+            if(!Utils.IsBusy())
+            {
+                StaticAlias.Firmament.Enqueue(true);
             }
             else
             {

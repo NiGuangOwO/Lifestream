@@ -1,6 +1,7 @@
 ﻿using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using Lifestream.Schedulers;
+using Lifestream.Tasks.Login;
 
 namespace Lifestream.Tasks.CrossDC;
 
@@ -12,9 +13,13 @@ internal static class TaskChangeDatacenter
     internal static void Enqueue(string destination, string charaName, uint charaHomeWorld, uint currentLoginWorld)
     {
         NumRetries = 0;
-        EnqueueVisitTasks(destination, charaName, charaHomeWorld, currentLoginWorld);
-        P.TaskManager.Enqueue(DCChange.ConfirmDcVisit, TaskSettings.Timeout2M);
-        P.TaskManager.Enqueue(() => DCChange.ConfirmDcVisit2(destination, charaName, charaHomeWorld, currentLoginWorld), TaskSettings.Timeout2M);
+        void tasks()
+        {
+            EnqueueVisitTasks(destination, charaName, charaHomeWorld, currentLoginWorld);
+            P.TaskManager.Enqueue(DCChange.ConfirmDcVisit, TaskSettings.Timeout2M);
+            P.TaskManager.Enqueue(() => DCChange.ConfirmDcVisit2(destination, charaName, charaHomeWorld, currentLoginWorld, tasks), "ConfirmDCVisit2", TaskSettings.Timeout2M);
+        }
+        tasks();
         P.TaskManager.Enqueue(DCChange.SelectOk, TaskSettings.TimeoutInfinite);
         P.TaskManager.Enqueue(() => DCChange.SelectServiceAccount(Utils.GetServiceAccount(charaName, charaHomeWorld)), $"SelectServiceAccount_{charaName}@{charaHomeWorld}", TaskSettings.Timeout1M);
     }
@@ -23,6 +28,7 @@ internal static class TaskChangeDatacenter
     {
         var dc = Utils.GetDataCenterName(destination);
         PluginLog.Debug($"Beginning data center changing process. Destination: {dc}, {destination}");
+        P.TaskManager.Enqueue(TaskChangeCharacter.ResetWorldIndex);
         P.TaskManager.Enqueue(() => DCChange.OpenContextMenuForChara(charaName, charaHomeWorld, currentLoginWorld), nameof(DCChange.OpenContextMenuForChara), TaskSettings.Timeout5M);
         P.TaskManager.Enqueue(DCChange.SelectVisitAnotherDC);
         P.TaskManager.Enqueue(DCChange.ConfirmDcVisitIntention);

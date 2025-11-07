@@ -99,7 +99,7 @@ public class CustomAliasCommand
         {
             P.TaskManager.Enqueue(() => Territory == 0 || Territory == Player.Territory, $"{Kind}: Wait for selected territory");
             P.TaskManager.Enqueue(() => IsScreenReady() && Player.Interactable && S.Ipc.VnavmeshIPC.IsReady() == true, $"{Kind}: Wait for screen and player interactable and vnav ready", new(timeLimitMS: 5 * 60 * 1000));
-            if(UseTA && Svc.PluginInterface.InstalledPlugins.Any(x => x.Name == "TextAdvance" && x.IsLoaded))
+            if(IsUsingTAForMovement())
             {
                 P.TaskManager.Enqueue(() =>
                 {
@@ -126,7 +126,6 @@ public class CustomAliasCommand
                         );
                 });
 
-                P.TaskManager.Enqueue(() => P.FollowPath.Move([.. appendMovement], true), $"{Kind}: Move");
                 P.TaskManager.Enqueue(WaitForMoveEndOrOccupied, $"{Kind}: Wait until move ends/occupied");
                 P.TaskManager.Enqueue(() => IsScreenReady() && Player.Interactable, $"{Kind}: Wait for screen and player interactable");
             }
@@ -280,7 +279,17 @@ public class CustomAliasCommand
                 });
             }, $"{Kind}: Wait for transition");
         }
+        else if(Kind == CustomAliasKind.Return_to_Home_World)
+        {
+            if(!Player.IsInHomeWorld)
+            {
+                P.TaskManager.Enqueue(() => IsScreenReady() && Player.Interactable, $"{Kind}: Wait for screen and player interactable");
+                var world = ExcelWorldHelper.GetName(World);
+                P.TPAndChangeWorld(world, S.Ipc.IPCProvider.CanVisitCrossDC(world), skipChecks: true);
+            }
+        }
     }
+    public bool IsUsingTAForMovement() => UseTA && Svc.PluginInterface.InstalledPlugins.Any(x => x.Name == "TextAdvance" && x.IsLoaded);
 
     private bool WaitForMoveEndOrOccupied()
     {

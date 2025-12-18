@@ -2,11 +2,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Authors>NightmareXIV</Authors>
-        <Version>2.5.3.3</Version>
+        <Version>2.5.3.8</Version>
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net9.0-windows7.0</TargetFramework>
+        <TargetFramework>net10.0-windows7.0</TargetFramework>
         <Platforms>x64</Platforms>
         <LangVersion>preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -65,7 +65,6 @@
 
 
     <ItemGroup>
-        
         <Reference Include="Newtonsoft.Json">
             <HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>
             <Private>False</Private>

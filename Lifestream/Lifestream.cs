@@ -8,6 +8,7 @@ using ECommons.Events;
 using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.MathHelpers;
+using ECommons.Reflection;
 using ECommons.SimpleGui;
 using ECommons.Singletons;
 using ECommons.Throttlers;
@@ -86,6 +87,7 @@ public unsafe class Lifestream : IDalamudPlugin
 #endif
         new TickScheduler(delegate
         {
+            DalamudReflector.SetImGuiAssertsState();
             TerritoryWatcher.Initialize();
             Config = EzConfig.Init<Config>();
             Utils.CheckConfigMigration();
@@ -699,7 +701,7 @@ public unsafe class Lifestream : IDalamudPlugin
                 return;
             }
 
-            var addon = component->ContainingAddon;
+            var addon = component->OwnerAddon;
             if(addon == null) addon = component->ContainingAddon2;
             if(addon == null || addon->NameString != "ChatLog")
             {
@@ -710,7 +712,7 @@ public unsafe class Lifestream : IDalamudPlugin
                 return;
             }
 
-            var currentText = component->UnkText1.ToString();
+            var currentText = component->EvaluatedString.ToString();
 
             if(currentText.StartsWith("/li", StringComparison.OrdinalIgnoreCase))
             {

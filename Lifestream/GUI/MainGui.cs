@@ -8,12 +8,12 @@ internal static unsafe class MainGui
     {
         PatreonBanner.DrawRight();
         ImGuiEx.EzTabBar("LifestreamTabs", PatreonBanner.Text,
-            ("Address Book", TabAddressBook.Draw, null, true),
-            ("House Registration", UIHouseReg.Draw, null, true),
-            ("Custom Alias", TabCustomAlias.Draw, null, true),
-            ("Utility", TabUtility.Draw, null, true),
-            ("Settings", UISettings.Draw, null, true),
-            ("Help", DrawHelp, null, true),
+            ("地址簿", TabAddressBook.Draw, null, true),
+            ("房屋登记", UIHouseReg.Draw, null, true),
+            ("自定义别名", TabCustomAlias.Draw, null, true),
+            ("实用", TabUtility.Draw, null, true),
+            ("设置", UISettings.Draw, null, true),
+            ("帮助", DrawHelp, null, true),
             ("Debug", UIDebug.Draw, ImGuiColors.DalamudGrey3, true)
             );
     }

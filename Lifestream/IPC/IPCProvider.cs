@@ -1,6 +1,4 @@
-﻿using ECommons.Configuration;
-using ECommons.EzIpcManager;
-using ECommons.GameHelpers;
+﻿using ECommons.EzIpcManager;
 using Lifestream.Data;
 using Lifestream.Enums;
 using Lifestream.GUI;
@@ -14,6 +12,7 @@ using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 
 namespace Lifestream.IPC;
+
 public class IPCProvider
 {
     private IPCProvider()
@@ -99,13 +98,14 @@ public class IPCProvider
     [EzIPC]
     public bool ChangeWorld(string world)
     {
-        if(IsBusy()) return false;
-        if(CanVisitCrossDC(world))
+        if (IsBusy())
+            return false;
+        if (CanVisitCrossDC(world))
         {
             P.TPAndChangeWorld(world, true);
             return true;
         }
-        else if(CanVisitSameDC(world))
+        else if (CanVisitSameDC(world))
         {
             P.TPAndChangeWorld(world, false);
             return true;
@@ -121,7 +121,7 @@ public class IPCProvider
     [EzIPC]
     public bool ChangeWorldById(uint worldId)
     {
-        if(Svc.Data.GetExcelSheet<World>().TryGetRow(worldId, out var sheet))
+        if (Svc.Data.GetExcelSheet<World>().TryGetRow(worldId, out var sheet))
         {
             return ChangeWorld(sheet.Name.GetText());
         }
@@ -136,7 +136,8 @@ public class IPCProvider
     [EzIPC]
     public bool AethernetTeleport(string destination)
     {
-        if(IsBusy()) return false;
+        if (IsBusy())
+            return false;
         TaskTryTpToAethernetDestination.Enqueue(destination);
         return true;
     }
@@ -149,7 +150,7 @@ public class IPCProvider
     [EzIPC]
     public bool AethernetTeleportByPlaceNameId(uint placeNameRowId)
     {
-        if(Svc.Data.GetExcelSheet<PlaceName>().TryGetRow(placeNameRowId, out var row))
+        if (Svc.Data.GetExcelSheet<PlaceName>().TryGetRow(placeNameRowId, out var row))
         {
             return AethernetTeleport(row.Name.GetText());
         }
@@ -165,7 +166,8 @@ public class IPCProvider
     public bool AethernetTeleportById(uint aethernetSheetRowId)
     {
         var name = Utils.GetAethernetNameWithOverrides(aethernetSheetRowId);
-        if(name == null) return false;
+        if (name == null)
+            return false;
         return AethernetTeleport(name);
     }
 
@@ -176,7 +178,7 @@ public class IPCProvider
     [EzIPC]
     public bool HousingAethernetTeleportById(uint housingAethernetSheetRow)
     {
-        if(Svc.Data.GetExcelSheet<HousingAethernet>().TryGetRow(housingAethernetSheetRow, out var row))
+        if (Svc.Data.GetExcelSheet<HousingAethernet>().TryGetRow(housingAethernetSheetRow, out var row))
         {
             return AethernetTeleport(row.PlaceName.Value.Name.GetText());
         }
@@ -200,7 +202,7 @@ public class IPCProvider
     [EzIPC]
     public uint GetActiveAetheryte()
     {
-        if(P.ActiveAetheryte != null)
+        if (P.ActiveAetheryte != null)
         {
             return P.ActiveAetheryte.Value.ID;
         }
@@ -214,7 +216,7 @@ public class IPCProvider
     [EzIPC]
     public uint GetActiveCustomAetheryte()
     {
-        if(S.Data.CustomAethernet.ActiveAetheryte != null)
+        if (S.Data.CustomAethernet.ActiveAetheryte != null)
         {
             return S.Data.CustomAethernet.ActiveAetheryte.Value.ID;
         }
@@ -228,7 +230,7 @@ public class IPCProvider
     [EzIPC]
     public uint GetActiveResidentialAetheryte()
     {
-        if(S.Data.ResidentialAethernet.ActiveAetheryte != null)
+        if (S.Data.ResidentialAethernet.ActiveAetheryte != null)
         {
             return S.Data.ResidentialAethernet.ActiveAetheryte.Value.ID;
         }
@@ -244,9 +246,9 @@ public class IPCProvider
     [EzIPC]
     public bool TeleportToFC()
     {
-        if(!P.TaskManager.IsBusy)
+        if (!P.TaskManager.IsBusy)
         {
-            TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.FC);
+            TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.部队房屋);
             return true;
         }
         return false;
@@ -255,9 +257,9 @@ public class IPCProvider
     [EzIPC]
     public bool TeleportToHome()
     {
-        if(!P.TaskManager.IsBusy)
+        if (!P.TaskManager.IsBusy)
         {
-            TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.Home);
+            TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.个人房屋);
             return true;
         }
         return false;
@@ -266,9 +268,9 @@ public class IPCProvider
     [EzIPC]
     public bool TeleportToApartment()
     {
-        if(!P.TaskManager.IsBusy)
+        if (!P.TaskManager.IsBusy)
         {
-            TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.Apartment);
+            TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.公寓);
             return true;
         }
         return false;
@@ -284,7 +286,7 @@ public class IPCProvider
     public HousePathData GetSharedHousePathData()
     {
         var e = TaskPropertyShortcut.GetSharedHouseAetheryteId(out var entry);
-        if(e.ID != 0)
+        if (e.ID != 0)
         {
             var data = Utils.GetCustomPathData(Utils.GetResidentialAetheryteByTerritoryType(entry.TerritoryId).Value, entry.Ward - 1, entry.Plot - 1);
             return data;
@@ -313,25 +315,25 @@ public class IPCProvider
     [EzIPC]
     public void EnterApartment(bool enter)
     {
-        TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.Apartment, null, null, enter);
+        TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.公寓, null, null, enter);
     }
 
     [EzIPC]
     public void EnqueueInnShortcut(int? innIndex)
     {
-        TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.Inn, default, innIndex);
+        TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.旅馆, default, innIndex);
     }
 
     [EzIPC]
     public void EnqueueLocalInnShortcut(int? innIndex)
     {
-        TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.Inn, default, innIndex, useSameWorld: true);
+        TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.旅馆, default, innIndex, useSameWorld: true);
     }
 
     [EzIPC]
     public (ResidentialAetheryteKind Kind, int Ward, int Plot)? GetCurrentPlotInfo()
     {
-        if(UIHouseReg.TryGetCurrentPlotInfo(out var kind, out var ward, out var plot))
+        if (UIHouseReg.TryGetCurrentPlotInfo(out var kind, out var ward, out var plot))
         {
             return (kind, ward, plot);
         }
@@ -366,28 +368,32 @@ public class IPCProvider
     [EzIPC]
     public bool? HasApartment()
     {
-        if(Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId) return null;
+        if (Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId)
+            return null;
         return TaskPropertyShortcut.GetApartmentAetheryteID().ID != 0;
     }
 
     [EzIPC]
     public bool? HasPrivateHouse()
     {
-        if(Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId) return null;
+        if (Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId)
+            return null;
         return TaskPropertyShortcut.GetPrivateHouseAetheryteID() != 0;
     }
 
     [EzIPC]
     public bool? HasSharedEstate()
     {
-        if(Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId) return null;
+        if (Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId)
+            return null;
         return TaskPropertyShortcut.GetSharedHouseAetheryteId(out _).ID != 0;
     }
 
     [EzIPC]
     public bool? HasFreeCompanyHouse()
     {
-        if(Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId) return null;
+        if (Player.Object.HomeWorld.RowId != Player.Object.CurrentWorld.RowId)
+            return null;
         return TaskPropertyShortcut.GetFreeCompanyAetheryteID() != 0;
     }
 
@@ -401,9 +407,10 @@ public class IPCProvider
     public bool CanMoveToWorkshop()
     {
         var data = Utils.GetFCPathData();
-        if(data == null) return false;
+        if (data == null)
+            return false;
         var plotDataAvailable = UIHouseReg.TryGetCurrentPlotInfo(out var kind, out var ward, out var plot);
-        if(plotDataAvailable)
+        if (plotDataAvailable)
         {
             return data.PathToWorkshop.Count > 0 && data.ResidentialDistrict == kind && data.Ward == ward && data.Plot == plot;
         }
@@ -413,11 +420,13 @@ public class IPCProvider
     [EzIPC]
     public void MoveToWorkshop()
     {
-        if(IsBusy()) return;
+        if (IsBusy())
+            return;
         var data = Utils.GetFCPathData();
-        if(data == null) return;
+        if (data == null)
+            return;
         var plotDataAvailable = UIHouseReg.TryGetCurrentPlotInfo(out var kind, out var ward, out var plot);
-        if(plotDataAvailable && data.PathToWorkshop.Count > 0 && data.PathToWorkshop.Count > 0 && data.ResidentialDistrict == kind && data.Ward == ward && data.Plot == plot)
+        if (plotDataAvailable && data.PathToWorkshop.Count > 0 && data.PathToWorkshop.Count > 0 && data.ResidentialDistrict == kind && data.Ward == ward && data.Plot == plot)
         {
             P.FollowPath.Move(data.PathToWorkshop, true);
         }
@@ -435,7 +444,7 @@ public class IPCProvider
     [EzIPC]
     public bool ConnectAndOpenCharaSelect(string charaName, string charaHomeWorld)
     {
-        if(IsBusy())
+        if (IsBusy())
         {
             return false;
         }
@@ -445,7 +454,7 @@ public class IPCProvider
     [EzIPC]
     public bool InitiateTravelFromCharaSelectScreen(string charaName, string charaHomeWorld, string destination, bool noLogin)
     {
-        if(IsBusy())
+        if (IsBusy())
         {
             return false;
         }
@@ -461,7 +470,7 @@ public class IPCProvider
     [EzIPC]
     public bool ConnectAndTravel(string charaName, string charaHomeWorld, string destination, bool noLogin)
     {
-        if(IsBusy() || !CanAutoLogin())
+        if (IsBusy() || !CanAutoLogin())
         {
             return false;
         }
@@ -473,7 +482,7 @@ public class IPCProvider
     [EzIPC]
     public bool InitiateLoginFromCharaSelectScreen(string charaName, string charaHomeWorld)
     {
-        if(IsBusy())
+        if (IsBusy())
         {
             return false;
         }
@@ -483,7 +492,7 @@ public class IPCProvider
     [EzIPC]
     public bool ConnectAndLogin(string charaName, string charaHomeWorld)
     {
-        if(IsBusy() || !CanAutoLogin())
+        if (IsBusy() || !CanAutoLogin())
         {
             return false;
         }
@@ -508,15 +517,18 @@ public class IPCProvider
     [EzIPC]
     public ErrorCode ChangeCharacter(string name, string world)
     {
-        if(Utils.IsBusy()) return ErrorCode.Plugin_is_busy;
+        if (Utils.IsBusy())
+            return ErrorCode.Plugin_is_busy;
         return Utils.ChangeCharacter(name, world);
     }
 
     [EzIPC]
     public ErrorCode Logout()
     {
-        if(Utils.IsBusy()) return ErrorCode.Plugin_is_busy;
-        if(!Player.Available) return ErrorCode.Player_is_not_logged_in;
+        if (Utils.IsBusy())
+            return ErrorCode.Plugin_is_busy;
+        if (!Player.Available)
+            return ErrorCode.Player_is_not_logged_in;
         TaskLogout.Enqueue();
         return ErrorCode.Success;
     }

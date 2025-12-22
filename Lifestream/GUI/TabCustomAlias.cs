@@ -1,18 +1,15 @@
 ﻿using ECommons.Configuration;
 using ECommons.ExcelServices;
-using ECommons.GameHelpers;
 using ECommons.ImGuiMethods.TerritorySelection;
 using ECommons.MathHelpers;
 using ECommons.SplatoonAPI;
-using FFXIVClientStructs;
 using Lifestream.Data;
-using Lifestream.Tasks.SameWorld;
 using Newtonsoft.Json;
-using NightmareUI;
 using NightmareUI.ImGuiElements;
 using Aetheryte = Lumina.Excel.Sheets.Aetheryte;
 
 namespace Lifestream.GUI;
+
 public static class TabCustomAlias
 {
     private static ImGuiEx.RealtimeDragDrop<CustomAliasCommand> DragDrop = new("CusACmd", x => x.ID);
@@ -23,16 +20,16 @@ public static class TabCustomAlias
         var selector = S.CustomAliasFileSystemManager.FileSystem.Selector;
         selector.Draw(150f.Scale());
         ImGui.SameLine();
-        if(ImGui.BeginChild("Child"))
+        if (ImGui.BeginChild("Child"))
         {
-            if(selector.Selected != null)
+            if (selector.Selected != null)
             {
                 var item = selector.Selected;
                 DrawAlias(item);
             }
             else
             {
-                ImGuiEx.TextWrapped($"To begin, select an alias you want to edit or create a new one.");
+                ImGuiEx.TextWrapped($"首先，选择要编辑的别名或创建新别名。");
             }
         }
         ImGui.EndChild();
@@ -43,20 +40,21 @@ public static class TabCustomAlias
     {
         AssignAllChainGroups(selected);
         DrawSplatoon(selected);
-        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "Add new"))
+        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "新增"))
         {
             selected.Commands.Add(new() { Territory = Player.Available ? Player.Territory : 0 });
         }
         ImGui.SameLine();
-        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Paste, "Paste"))
+        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Paste, "粘贴"))
         {
             try
             {
                 var result = JsonConvert.DeserializeObject<CustomAliasCommand>(Paste());
-                if(result == null) throw new NullReferenceException();
+                if (result == null)
+                    throw new NullReferenceException();
                 selected.Commands.Add(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Notify.Error(e.Message);
                 e.Log();
@@ -66,31 +64,33 @@ public static class TabCustomAlias
         ImGui.Checkbox("##en", ref selected.Enabled);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(100f.Scale());
-        if(!selected.Enabled) ImGui.BeginDisabled();
+        if (!selected.Enabled)
+            ImGui.BeginDisabled();
         ImGui.InputText($"##Alias", ref selected.Alias, 50);
-        if(!selected.Enabled) ImGui.EndDisabled();
-        ImGuiEx.Tooltip("Enabled");
+        if (!selected.Enabled)
+            ImGui.EndDisabled();
+        ImGuiEx.Tooltip("启用");
         ImGui.SameLine();
-        ImGuiEx.HelpMarker($"Will be available via \"/li {selected.Alias}\" command");
+        ImGuiEx.HelpMarker($"将通过 \"/li {selected.Alias}\" 命令可用");
         ImGui.SameLine();
-        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Play, "Run", enabled: !Utils.IsBusy()))
+        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Play, "运行", enabled: !Utils.IsBusy()))
         {
             selected.Enqueue();
         }
         ImGui.SameLine();
-        ImGuiEx.Text("Visualisation:");
+        ImGuiEx.Text("可视化:");
         ImGuiEx.PluginAvailabilityIndicator([new("Splatoon")]);
         DragDrop.Begin();
         var cursor = ImGui.GetCursorPos();
-        foreach(var x in PostTableActions)
+        foreach (var x in PostTableActions)
         {
             x();
         }
         ImGui.SetCursorPos(cursor);
         PostTableActions.Clear();
-        if(ImGuiEx.BeginDefaultTable(["Control", "~Command"], false))
+        if (ImGuiEx.BeginDefaultTable(["Control", "~Command"], false))
         {
-            for(var i = 0; i < selected.Commands.Count; i++)
+            for (var i = 0; i < selected.Commands.Count; i++)
             {
                 var x = selected.Commands[i];
                 var index = i;
@@ -102,7 +102,7 @@ public static class TabCustomAlias
                 DragDrop.DrawButtonDummy(x, selected.Commands, i);
                 ImGui.TableNextColumn();
                 var curpos = ImGui.GetCursorPos() + ImGui.GetContentRegionAvail() with { Y = 0 };
-                if(x.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point, CustomAliasKind.Circular_movement))
+                if (x.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point, CustomAliasKind.Circular_movement))
                 {
                     var insertIndex = i + 1;
                     PostTableActions.Add(() =>
@@ -117,7 +117,7 @@ public static class TabCustomAlias
                         var col = x.ChainGroup == 0 ? Vector4.Zero : TabCustomAlias.ChainColors.SafeSelect(x.ChainGroup - 1);
                         ImGuiEx.Text(col, UiBuilder.IconFont, FontAwesomeIcon.Link.ToIconString());
                         ImGui.SameLine();
-                        if(ImGuiEx.IconButton((FontAwesomeIcon)'\uf0ab', x.ID, enabled: Player.Available))
+                        if (ImGuiEx.IconButton((FontAwesomeIcon)'\uf0ab', x.ID, enabled: Player.Available))
                         {
                             new TickScheduler(() =>
                             {
@@ -130,7 +130,7 @@ public static class TabCustomAlias
                                 });
                             });
                         }
-                        ImGuiEx.Tooltip($"Create move command after this command with player's position and territory");
+                        ImGuiEx.Tooltip($"在此命令之后，创建包含玩家位置和房屋信息的移动命令。");
                     });
                 }
 
@@ -144,9 +144,9 @@ public static class TabCustomAlias
 
     private static string GetExtraText(CustomAliasCommand x)
     {
-        if(x.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point))
+        if (x.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point))
         {
-            if(x.Territory == 0)
+            if (x.Territory == 0)
             {
                 return $" {x.Point:F1}";
             }
@@ -155,29 +155,29 @@ public static class TabCustomAlias
                 return $" {x.Point:F1} [{ExcelTerritoryHelper.GetName(x.Territory)}]";
             }
         }
-        else if(x.Kind == CustomAliasKind.Circular_movement)
+        else if (x.Kind == CustomAliasKind.Circular_movement)
         {
-            if(x.Territory != 0)
+            if (x.Territory != 0)
             {
                 return $" [{ExcelTerritoryHelper.GetName(x.Territory)}]";
             }
         }
-        else if(x.Kind == CustomAliasKind.Teleport_to_Aetheryte)
+        else if (x.Kind == CustomAliasKind.Teleport_to_Aetheryte)
         {
-            if(AetherytePlaceNames.TryGetValue(x.Aetheryte, out var ret))
+            if (AetherytePlaceNames.TryGetValue(x.Aetheryte, out var ret))
             {
                 return $" [{ret}]";
             }
         }
-        else if(x.Kind == CustomAliasKind.Use_Aethernet)
+        else if (x.Kind == CustomAliasKind.Use_Aethernet)
         {
             return $" [{Utils.KnownAetherytes.SafeSelect(x.Aetheryte, x.Aetheryte.ToString())}]";
         }
-        else if(x.Kind == CustomAliasKind.Change_world)
+        else if (x.Kind == CustomAliasKind.Change_world)
         {
             return $" [{ExcelWorldHelper.GetName(x.World)}]";
         }
-        else if(x.Kind == CustomAliasKind.Interact)
+        else if (x.Kind == CustomAliasKind.Interact)
         {
             return $" [{x.DataID}]";
         }
@@ -186,10 +186,11 @@ public static class TabCustomAlias
 
     private static void DrawSplatoon(CustomAlias alias)
     {
-        if(!Splatoon.IsConnected()) return;
+        if (!Splatoon.IsConnected())
+            return;
         {
             var lines = Utils.GenerateGroupConnectionLines(alias);
-            foreach(var x in lines)
+            foreach (var x in lines)
             {
                 var line = S.Ipc.SplatoonManager.GetNextLine(EColor.GreenBright, 1f);
                 line.SetRefCoord(x.Start);
@@ -199,7 +200,7 @@ public static class TabCustomAlias
         }
         {
             var lines = Utils.GenerateGroupConnectionLines(alias, 0.25f);
-            foreach(var x in lines)
+            foreach (var x in lines)
             {
                 var line = S.Ipc.SplatoonManager.GetNextLine(EColor.YellowBright, 1f);
                 line.SetRefCoord(x.Start);
@@ -211,8 +212,9 @@ public static class TabCustomAlias
 
     private static void DrawSplatoon(CustomAliasCommand command, int index)
     {
-        if(!Splatoon.IsConnected()) return;
-        if(command.Kind == CustomAliasKind.Circular_movement)
+        if (!Splatoon.IsConnected())
+            return;
+        if (command.Kind == CustomAliasKind.Circular_movement)
         {
             {
                 var point = S.Ipc.SplatoonManager.GetNextPoint($"{index + 1}: Circular movement");
@@ -232,7 +234,7 @@ public static class TabCustomAlias
                 Splatoon.DisplayOnce(point);
             }
         }
-        else if(command.Kind == CustomAliasKind.Move_to_point)
+        else if (command.Kind == CustomAliasKind.Move_to_point)
         {
             {
                 var point = S.Ipc.SplatoonManager.GetNextPoint($"{index + 1}: Walk to");
@@ -251,7 +253,7 @@ public static class TabCustomAlias
                 Splatoon.DisplayOnce(point);
             }
         }
-        else if(command.Kind == CustomAliasKind.Navmesh_to_point)
+        else if (command.Kind == CustomAliasKind.Navmesh_to_point)
         {
             var point = S.Ipc.SplatoonManager.GetNextPoint($"{index + 1}: Navmesh to");
             point.SetRefCoord(command.Point);
@@ -266,41 +268,41 @@ public static class TabCustomAlias
     private static void DrawCommand(CustomAliasCommand command, CustomAlias selected, int index)
     {
         ImGui.PushID(command.ID);
-        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Copy, "Copy"))
+        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Copy, "复制"))
         {
             Copy(EzConfig.DefaultSerializationFactory.Serialize(command, false));
         }
         ImGui.SameLine();
-        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Trash, "Delete", ImGuiEx.Ctrl))
+        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Trash, "删除", ImGuiEx.Ctrl))
         {
             new TickScheduler(() => selected.Commands.Remove(command));
         }
         ImGuiEx.Tooltip("Press CTRL and click");
 
         ImGui.SameLine();
-        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Play, "Run", enabled: !Utils.IsBusy()))
+        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Play, "运行", enabled: !Utils.IsBusy()))
         {
             selected.Enqueue(inclusiveStart: index, exclusiveEnd: index + 1);
         }
         ImGui.SameLine();
-        if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.AngleDoubleDown, "Run and continue", enabled: !Utils.IsBusy()))
+        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.AngleDoubleDown, "运行并继续", enabled: !Utils.IsBusy()))
         {
             selected.Enqueue(inclusiveStart: index);
         }
 
         ImGui.Separator();
         ImGui.SetNextItemWidth(150f.Scale());
-        ImGuiEx.EnumCombo("Alias kind", ref command.Kind);
+        ImGuiEx.EnumCombo("别名类型", ref command.Kind);
 
-        if(command.Kind == CustomAliasKind.Teleport_to_Aetheryte)
+        if (command.Kind == CustomAliasKind.Teleport_to_Aetheryte)
         {
             ImGui.SetNextItemWidth(150f.Scale());
-            ImGuiEx.Combo("Select aetheryte to teleport to", ref command.Aetheryte, Aetherytes, names: AetherytePlaceNames);
+            ImGuiEx.Combo("选择要传送的以太之光", ref command.Aetheryte, Aetherytes, names: AetherytePlaceNames);
             ImGui.SetNextItemWidth(60f.Scale());
-            ImGui.DragFloat("Skip teleport if already at aetheryte within this range", ref command.SkipTeleport, 0.01f);
+            ImGui.DragFloat("如果已经处于此范围内的以太之光附近，则跳过传送", ref command.SkipTeleport, 0.01f);
         }
 
-        if(command.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point))
+        if (command.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point))
         {
             Utils.DrawVector3Selector($"walktopoint{command.ID}", ref command.Point);
             ImGui.SameLine();
@@ -308,18 +310,18 @@ public static class TabCustomAlias
             ImGui.SameLine(0, 1);
             ImGui.SetNextItemWidth(50f.Scale());
             ImGuiEx.SliderFloat($"##scatter", ref command.Scatter, 0f, 2f);
-            ImGuiEx.Tooltip("Scatter. Double-click to input manually.");
+            ImGuiEx.Tooltip("散点。双击手动输入。");
         }
 
-        if(command.Kind.EqualsAny(CustomAliasKind.Move_to_point))
+        if (command.Kind.EqualsAny(CustomAliasKind.Move_to_point))
         {
             drawFlight();
         }
 
-        if(command.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point, CustomAliasKind.Circular_movement))
+        if (command.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point, CustomAliasKind.Circular_movement))
         {
             ImGui.SetNextItemWidth(150f.Scale());
-            if(ImGui.BeginCombo("Restrict movement to zone", command.Territory == 0 ? "No Restriction" : ExcelTerritoryHelper.GetName(command.Territory)))
+            if (ImGui.BeginCombo("限制在区域内活动", command.Territory == 0 ? "无限制" : ExcelTerritoryHelper.GetName(command.Territory)))
             {
                 _ = new TerritorySelector((TerritorySelector sel, uint territory) =>
                 {
@@ -333,36 +335,36 @@ public static class TabCustomAlias
                 ImGui.EndCombo();
             }
             ImGui.SameLine();
-            if(ImGuiEx.IconButton(FontAwesomeIcon.Eraser, enabled: command.Territory != 0))
+            if (ImGuiEx.IconButton(FontAwesomeIcon.Eraser, enabled: command.Territory != 0))
             {
                 command.Territory = 0;
             }
-            ImGuiEx.Tooltip("Remove Requirement");
+            ImGuiEx.Tooltip("移除要求");
             ImGui.SameLine(0, 1);
-            if(ImGuiEx.IconButton(FontAwesomeIcon.MapPin, enabled: Player.Available))
+            if (ImGuiEx.IconButton(FontAwesomeIcon.MapPin, enabled: Player.Available))
             {
                 command.Territory = Player.Territory;
             }
             ImGui.SameLine(0, 1);
-            ImGuiEx.Tooltip($"Set to {ExcelTerritoryHelper.GetName(Player.Territory)}");
-            if(ImGuiEx.IconButton(FontAwesomeIcon.ArrowDownUpAcrossLine))
+            ImGuiEx.Tooltip($"设置至 {ExcelTerritoryHelper.GetName(Player.Territory)}");
+            if (ImGuiEx.IconButton(FontAwesomeIcon.ArrowDownUpAcrossLine))
             {
                 ImGui.OpenPopup("SpreadTerritory");
             }
-            ImGuiEx.Tooltip("Copy this property to adjacent commands...");
-            if(ImGui.BeginPopup("SpreadTerritory"))
+            ImGuiEx.Tooltip("将此属性复制到相邻命令...");
+            if (ImGui.BeginPopup("SpreadTerritory"))
             {
-                ImGuiEx.Text($"Copy territory requirement:\n{ExcelTerritoryHelper.GetName(command.Territory)}");
-                ImGuiEx.TextV("Up or down until command number:");
+                ImGuiEx.Text($"复制区域要求:\n{ExcelTerritoryHelper.GetName(command.Territory)}");
+                ImGuiEx.TextV("向上或向下直到命令编号:");
                 ImGui.SetNextItemWidth(150f.Scale());
                 ImGuiEx.FilteringInputInt("##cmdNum", out var cmdNum);
                 ImGui.SameLine();
-                if(ImGui.Button("OK"))
+                if (ImGui.Button("OK"))
                 {
                     selected.CopyTerritoryRange(index, cmdNum);
                     ImGui.CloseCurrentPopup();
                 }
-                if(ImGui.Selectable("To all the commands within this alias"))
+                if (ImGui.Selectable("此别名下的所有命令"))
                 {
                     selected.Commands.Each(x => x.Territory = command.Territory);
                 }
@@ -371,36 +373,36 @@ public static class TabCustomAlias
         }
 
 
-        if(command.Kind.EqualsAny(CustomAliasKind.Navmesh_to_point))
+        if (command.Kind.EqualsAny(CustomAliasKind.Navmesh_to_point))
         {
             ImGui.SameLine(0, 1);
             ImGuiEx.ButtonCheckbox(FontAwesomeIcon.FastForward, ref command.UseTA, EColor.Green);
-            ImGuiEx.Tooltip("Use TextAdvance for movement. Flight settings are inherited from TextAdvance.");
-            if(!command.UseTA)
+            ImGuiEx.Tooltip("使用 TextAdvance 进行移动。飞行设置继承自 TextAdvance 。");
+            if (!command.UseTA)
             {
                 drawFlight();
             }
         }
 
-        if(command.Kind == CustomAliasKind.Move_to_point)
+        if (command.Kind == CustomAliasKind.Move_to_point)
         {
-            if(command.ExtraPoints.Count > 0)
+            if (command.ExtraPoints.Count > 0)
             {
-                ImGuiEx.Text("Extra Points:");
+                ImGuiEx.Text("额外点:");
             }
             ImGui.Indent();
-            for(var i = 0; i < command.ExtraPoints.Count; i++)
+            for (var i = 0; i < command.ExtraPoints.Count; i++)
             {
                 var pointIndex = i;
                 ImGui.PushID($"Point{i}");
                 var x = command.ExtraPoints[i];
                 Utils.DrawVector3Selector($"walktopointextra{i}{command.ID}", ref x);
-                if(x != command.ExtraPoints[i])
+                if (x != command.ExtraPoints[i])
                 {
                     command.ExtraPoints[i] = x;
                 }
                 ImGui.SameLine(0, 1);
-                if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+                if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
                 {
                     new TickScheduler(() => command.ExtraPoints.RemoveAt(pointIndex));
                 }
@@ -408,53 +410,56 @@ public static class TabCustomAlias
             }
             ImGui.Unindent();
 
-            if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "Add Extra Point"))
+            if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "添加额外点"))
             {
                 command.ExtraPoints.Add(new());
             }
-            ImGuiEx.Tooltip("Random point will be selected. Scatter will remain the same across all points.");
+            ImGuiEx.Tooltip("将随机选择一个点。所有点的散布分布将保持不变。");
         }
 
         void drawFlight()
         {
             ImGui.SameLine(0, 1);
             ImGuiEx.ButtonCheckbox(FontAwesomeIcon.Plane, ref command.UseFlight, EColor.Green);
-            ImGuiEx.Tooltip("Fly for movement. Don't forget to use \"Mount Up\" command before. ");
+            ImGuiEx.Tooltip("飞行移动。别忘了事先使用“骑乘”命令。");
         }
 
-        if(command.Kind == CustomAliasKind.Change_world)
+        if (command.Kind == CustomAliasKind.Change_world)
         {
             ImGui.SetNextItemWidth(150f.Scale());
             WorldSelector.Instance.Draw(ref command.World);
             ImGui.SameLine();
-            ImGuiEx.Text("Select world");
+            ImGuiEx.Text("选择服务器");
         }
 
-        if(command.Kind == CustomAliasKind.Use_Aethernet)
+        if (command.Kind == CustomAliasKind.Use_Aethernet)
         {
             ImGui.SetNextItemWidth(150f.Scale());
-            if(ImGui.BeginCombo("Select aethernet shard to teleport to", command.Aetheryte == 0 ? "- Not selected -" : Utils.KnownAetherytes.SafeSelect(command.Aetheryte, command.Aetheryte.ToString()), ImGuiComboFlags.HeightLarge))
+            if (ImGui.BeginCombo("选择要传送到的城内以太水晶", command.Aetheryte == 0 ? "- 未选择 -" : Utils.KnownAetherytes.SafeSelect(command.Aetheryte, command.Aetheryte.ToString()), ImGuiComboFlags.HeightLarge))
             {
                 ref var filter = ref Ref<string>.Get($"Filter{command.ID}");
                 ImGui.SetNextItemWidth(200f);
                 ImGui.InputTextWithHint("##filter", "Filter", ref filter, 50);
-                foreach(var x in Utils.KnownAetherytesByCategories)
+                foreach (var x in Utils.KnownAetherytesByCategories)
                 {
                     bool shouldHide(ref string filter, KeyValuePair<uint, string> v) => filter.Length > 0 && !v.Value.Contains(filter, StringComparison.OrdinalIgnoreCase) && !x.Key.Contains(filter, StringComparison.OrdinalIgnoreCase);
-                    foreach(var v in x.Value)
+                    foreach (var v in x.Value)
                     {
-                        if(!shouldHide(ref filter, v)) goto Display;
+                        if (!shouldHide(ref filter, v))
+                            goto Display;
                     }
                     continue;
                 Display:
                     ImGuiEx.Text(EColor.YellowBright, $"{x.Key}:");
                     ImGui.Indent();
-                    foreach(var v in x.Value)
+                    foreach (var v in x.Value)
                     {
-                        if(shouldHide(ref filter, v)) continue;
+                        if (shouldHide(ref filter, v))
+                            continue;
                         var sel = command.Aetheryte == v.Key;
-                        if(sel && ImGui.IsWindowAppearing()) ImGui.SetScrollHereY();
-                        if(ImGui.Selectable($"{v.Value}##{v.Key}", sel))
+                        if (sel && ImGui.IsWindowAppearing())
+                            ImGui.SetScrollHereY();
+                        if (ImGui.Selectable($"{v.Value}##{v.Key}", sel))
                         {
                             command.Aetheryte = v.Key;
                         }
@@ -466,44 +471,44 @@ public static class TabCustomAlias
             }
         }
 
-        if(command.Kind == CustomAliasKind.Circular_movement)
+        if (command.Kind == CustomAliasKind.Circular_movement)
         {
-            if(ImGui.BeginTable("circular", 2, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.NoSavedSettings))
+            if (ImGui.BeginTable("circular", 2, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.NoSavedSettings))
             {
                 ImGui.TableSetupColumn("1");
                 ImGui.TableSetupColumn("1", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableNextRow();
 
                 ImGui.TableNextColumn();
-                ImGuiEx.TextV($"Center point: ");
+                ImGuiEx.TextV($"中心点: ");
                 ImGui.TableNextColumn();
                 Utils.DrawVector2Selector("center", ref command.CenterPoint);
 
                 ImGui.TableNextColumn();
-                ImGuiEx.TextV($"Exit point: ");
+                ImGuiEx.TextV($"出口: ");
                 ImGui.TableNextColumn();
                 Utils.DrawVector3Selector($"exit{command.ID}", ref command.CircularExitPoint);
-                ImGui.Checkbox("Finish by walking to exit point", ref command.WalkToExit);
+                ImGui.Checkbox("最后步行至出口。", ref command.WalkToExit);
 
                 ImGui.TableNextColumn();
-                ImGuiEx.TextV($"Precision: ");
+                ImGuiEx.TextV($"精确: ");
                 ImGui.TableNextColumn();
                 ImGui.SetNextItemWidth(100f.Scale());
                 ImGui.DragFloat("##precision", ref command.Precision.ValidateRange(4f, 100f), 0.01f);
 
                 ImGui.TableNextColumn();
-                ImGuiEx.TextV($"Tolerance: ");
+                ImGuiEx.TextV($"宽容: ");
                 ImGui.TableNextColumn();
                 ImGui.SetNextItemWidth(100f.Scale());
                 ImGui.DragInt("##tol", ref command.Tolerance.ValidateRange(1, (int)(command.Precision * 0.75f)), 0.01f);
 
                 ImGui.TableNextColumn();
-                ImGuiEx.TextV($"Distance limit: ");
+                ImGuiEx.TextV($"距离限制: ");
                 ImGui.TableNextColumn();
                 var en = command.Clamp != null;
-                if(ImGui.Checkbox($"##clamp", ref en))
+                if (ImGui.Checkbox($"##clamp", ref en))
                 {
-                    if(en)
+                    if (en)
                     {
                         command.Clamp = (0, 10);
                     }
@@ -512,7 +517,7 @@ public static class TabCustomAlias
                         command.Clamp = null;
                     }
                 }
-                if(command.Clamp != null)
+                if (command.Clamp != null)
                 {
                     var v = command.Clamp.Value;
                     ImGui.SameLine(0, 1);
@@ -523,53 +528,53 @@ public static class TabCustomAlias
                     ImGui.SameLine(0, 1);
                     ImGui.SetNextItemWidth(50f.Scale());
                     ImGui.DragFloat("##prec2", ref v.Max, 0.01f);
-                    if(v.Min < v.Max)
+                    if (v.Min < v.Max)
                     {
                         command.Clamp = v;
                     }
-                    if(Svc.Targets.Target != null)
+                    if (Svc.Targets.Target != null)
                     {
                         ImGui.SameLine(0, 1);
-                        ImGuiEx.Text($"To target: {Player.DistanceTo(Svc.Targets.Target):F1}");
+                        ImGuiEx.Text($"到目标: {Player.DistanceTo(Svc.Targets.Target):F1}");
                     }
                 }
 
                 ImGui.EndTable();
             }
         }
-        if(command.Kind == CustomAliasKind.Interact)
+        if (command.Kind == CustomAliasKind.Interact)
         {
             ImGui.SetNextItemWidth(150f.Scale());
             ImGuiEx.InputUint("Data ID", ref command.DataID);
             ImGui.SameLine(0, 1);
-            if(ImGuiEx.Button("Target", Svc.Targets.Target?.DataId != 0))
+            if (ImGuiEx.Button("目标", Svc.Targets.Target?.DataId != 0))
             {
                 command.DataID = Svc.Targets.Target.DataId;
             }
-            ImGuiEx.InputFloat(100f, "Approach before interacting to this distance", ref command.InteractDistance, 1, 1);
+            ImGuiEx.InputFloat(100f, "在进行互动之前，请保持此距离。", ref command.InteractDistance, 1, 1);
         }
-        if(command.Kind == CustomAliasKind.Mount_Up)
+        if (command.Kind == CustomAliasKind.Mount_Up)
         {
-            ImGui.Checkbox("Only mount up if enabled in configuration", ref command.MountUpConditional);
+            ImGui.Checkbox("仅当在配置中启用时才骑乘", ref command.MountUpConditional);
         }
-        if(command.Kind.EqualsAny(CustomAliasKind.Select_Yes, CustomAliasKind.Select_List_Option))
+        if (command.Kind.EqualsAny(CustomAliasKind.Select_Yes, CustomAliasKind.Select_List_Option))
         {
-            ImGuiEx.TextWrapped($"List entries that you would like to select/confirm:");
-            if(ImGuiEx.BeginDefaultTable("ItemLst", ["~1", "2"], false))
+            ImGuiEx.TextWrapped($"请列出您想要选择/确认的条目:");
+            if (ImGuiEx.BeginDefaultTable("ItemLst", ["~1", "2"], false))
             {
-                for(var i = 0; i < command.SelectOption.Count; i++)
+                for (var i = 0; i < command.SelectOption.Count; i++)
                 {
                     ImGui.PushID(i);
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGuiEx.SetNextItemFullWidth();
                     var str = command.SelectOption[i];
-                    if(ImGui.InputText("##selectOpt", ref str, 500))
+                    if (ImGui.InputText("##selectOpt", ref str, 500))
                     {
                         command.SelectOption[i] = str;
                     }
                     ImGui.TableNextColumn();
-                    if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+                    if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
                     {
                         var idx = i;
                         new TickScheduler(() => command.SelectOption.RemoveAt(idx));
@@ -577,20 +582,20 @@ public static class TabCustomAlias
                     ImGui.PopID();
                 }
                 ImGui.EndTable();
-                if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "Add New Option"))
+                if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "添加新选项"))
                 {
                     command.SelectOption.Add("");
                 }
             }
         }
-        if(command.Kind.EqualsAny(CustomAliasKind.Select_Yes, CustomAliasKind.Select_List_Option, CustomAliasKind.Confirm_Contents_Finder))
+        if (command.Kind.EqualsAny(CustomAliasKind.Select_Yes, CustomAliasKind.Select_List_Option, CustomAliasKind.Confirm_Contents_Finder))
         {
-            ImGui.Checkbox("Skip on screen fade", ref command.StopOnScreenFade);
+            ImGui.Checkbox("跳过屏幕淡出", ref command.StopOnScreenFade);
         }
 
-        if(command.Kind.EqualsAny(CustomAliasKind.Wait_for_Transition))
+        if (command.Kind.EqualsAny(CustomAliasKind.Wait_for_Transition))
         {
-            ImGui.Checkbox("Require territory change", ref command.RequireTerritoryChange);
+            ImGui.Checkbox("需要区域改变", ref command.RequireTerritoryChange);
         }
         ImGui.PopID();
     }
@@ -598,26 +603,26 @@ public static class TabCustomAlias
     public static void AssignAllChainGroups(CustomAlias alias)
     {
         var commands = alias.Commands;
-        if(commands == null || commands.Count == 0)
+        if (commands == null || commands.Count == 0)
         {
             return;
         }
 
         var nextChainGroup = 1;
 
-        for(var i = 0; i < commands.Count;)
+        for (var i = 0; i < commands.Count;)
         {
-            if(i < commands.Count - 1 && Utils.IsChainedWithNext(alias, i))
+            if (i < commands.Count - 1 && Utils.IsChainedWithNext(alias, i))
             {
                 var start = i;
                 var end = i;
 
-                while(end < commands.Count - 1 && Utils.IsChainedWithNext(alias, end))
+                while (end < commands.Count - 1 && Utils.IsChainedWithNext(alias, end))
                 {
                     end++;
                 }
 
-                for(var j = start; j <= end; j++)
+                for (var j = start; j <= end; j++)
                 {
                     commands[j].ChainGroup = nextChainGroup;
                 }

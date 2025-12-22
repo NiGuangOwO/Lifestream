@@ -24,11 +24,11 @@ public class ProgressOverlay : Window
     public override void Draw()
     {
         CImGui.igBringWindowToDisplayBack(CImGui.igGetCurrentWindow());
-        if(ImGui.IsWindowHovered())
+        if (ImGui.IsWindowHovered())
         {
             ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            ImGui.SetTooltip("Right click to stop all tasks and movement");
-            if(ImGui.IsMouseClicked(ImGuiMouseButton.Right))
+            ImGui.SetTooltip("右键单击可停止所有任务和移动");
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
             {
                 P.TaskManager.Abort();
                 P.followPath?.Stop();
@@ -37,27 +37,27 @@ public class ProgressOverlay : Window
         float percent;
         Vector4 col;
         string overlay;
-        if(P.followPath != null && P.FollowPath.Waypoints.Count > 0)
+        if (P.followPath != null && P.FollowPath.Waypoints.Count > 0)
         {
-            percent = 1f - (float)P.FollowPath.Waypoints.Count / (float)P.FollowPath.MaxWaypoints;
+            percent = 1f - P.FollowPath.Waypoints.Count / (float)P.FollowPath.MaxWaypoints;
             col = GradientColor.Get(EColor.Red, EColor.Violet);
-            overlay = $"Lifestream Movement: {P.FollowPath.MaxWaypoints - P.FollowPath.Waypoints.Count}/{P.FollowPath.MaxWaypoints}";
-            if(Splatoon.IsConnected())
+            overlay = $"Lifestream 移动: {P.FollowPath.MaxWaypoints - P.FollowPath.Waypoints.Count}/{P.FollowPath.MaxWaypoints}";
+            if (Splatoon.IsConnected())
             {
                 S.Ipc.SplatoonManager.RenderPath(P.FollowPath.Waypoints);
             }
         }
         else
         {
-            percent = 1f - (float)P.TaskManager.NumQueuedTasks / (float)P.TaskManager.MaxTasks;
+            percent = 1f - P.TaskManager.NumQueuedTasks / (float)P.TaskManager.MaxTasks;
             col = EColor.Violet;
-            overlay = $"Lifestream Progress: {P.TaskManager.MaxTasks - P.TaskManager.NumQueuedTasks}/{P.TaskManager.MaxTasks}";
+            overlay = $"Lifestream 进度: {P.TaskManager.MaxTasks - P.TaskManager.NumQueuedTasks}/{P.TaskManager.MaxTasks}";
         }
         ImGui.PushStyleColor(ImGuiCol.PlotHistogram, col);
         ImGui.ProgressBar(percent, new(ImGui.GetContentRegionAvail().X, 20), overlay);
         ImGui.PopStyleColor();
         // Toggle ProgressOverlay position logic
-        if(C.ProgressOverlayToTop)
+        if (C.ProgressOverlayToTop)
         {
             Position = new(0, 0);
         }

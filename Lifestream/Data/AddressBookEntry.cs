@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Lifestream.Data;
+
 [Serializable]
 public class AddressBookEntry
 {
@@ -49,17 +50,17 @@ public class AddressBookEntry
         };
     }
 
-    public bool ShouldSerializeApartment() => PropertyType == PropertyType.Apartment;
-    public bool ShouldSerializeApartmentSubdivision() => PropertyType == PropertyType.Apartment;
-    public bool ShouldSerializePlot() => PropertyType == PropertyType.House;
+    public bool ShouldSerializeApartment() => PropertyType == PropertyType.公寓;
+    public bool ShouldSerializeApartmentSubdivision() => PropertyType == PropertyType.公寓;
+    public bool ShouldSerializePlot() => PropertyType == PropertyType.房屋;
 
     public string GetAddressString()
     {
-        if(PropertyType == PropertyType.House)
+        if (PropertyType == PropertyType.房屋)
         {
             return $"{ExcelWorldHelper.GetName(World)}, {TabAddressBook.ResidentialNames.SafeSelect(City)}, W{Ward}, P{Plot}";
         }
-        if(PropertyType == PropertyType.Apartment)
+        if (PropertyType == PropertyType.公寓)
         {
             return $"{ExcelWorldHelper.GetName(World)}, {TabAddressBook.ResidentialNames.SafeSelect(City)}, W{Ward}{(ApartmentSubdivision ? " subdivision" : "")}, Apartment {Apartment}";
         }
@@ -68,37 +69,37 @@ public class AddressBookEntry
 
     public bool IsValid([NotNullWhen(false)] out string error)
     {
-        if(Name == null)
+        if (Name == null)
         {
             error = "Name is not a valid string";
             return false;
         }
-        if(!ExcelWorldHelper.GetPublicWorlds().Any(x => x.RowId == World))
+        if (!ExcelWorldHelper.GetPublicWorlds().Any(x => x.RowId == World))
         {
             error = "World identifier is not valid";
             return false;
         }
-        if(!Enum.GetValues<ResidentialAetheryteKind>().Contains(City))
+        if (!Enum.GetValues<ResidentialAetheryteKind>().Contains(City))
         {
             error = "Residential aetheryte is not valid";
             return false;
         }
-        if(Ward < 1 || Ward > 30)
+        if (Ward < 1 || Ward > 30)
         {
             error = "Ward number is out of range";
             return false;
         }
-        if(Plot < 1 || Plot > 60)
+        if (Plot < 1 || Plot > 60)
         {
             error = "Plot number is out of range";
             return false;
         }
-        if(Apartment < 1)
+        if (Apartment < 1)
         {
             error = "Apartment number is out of range";
             return false;
         }
-        if(Name == null)
+        if (Name == null)
         {
             error = "Alias is not a valid string";
             return false;

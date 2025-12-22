@@ -1,5 +1,6 @@
 ﻿namespace Lifestream.Data;
+
 public enum HouseEnterMode
 {
-    None, Walk_to_door, Enter_house, Enter_workshop
+    无, 走到门口, 进入房屋, 进入工房
 }

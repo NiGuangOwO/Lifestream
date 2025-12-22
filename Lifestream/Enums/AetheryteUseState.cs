@@ -1,5 +1,6 @@
 ﻿namespace Lifestream.Enums;
+
 public enum AetheryteUseState
 {
-    None, Normal, Residential, Custom
+    无, 普通, 住宅, 自定义
 }

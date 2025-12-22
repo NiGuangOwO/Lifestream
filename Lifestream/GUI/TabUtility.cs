@@ -1,16 +1,16 @@
-﻿using ECommons.GameHelpers;
-using Lifestream.Paissa;
+﻿using Lifestream.Paissa;
 using NightmareUI.ImGuiElements;
 using NightmareUI.PrimaryUI;
 
 namespace Lifestream.GUI;
+
 public static class TabUtility
 {
     public static int TargetWorldID = 0;
     private static WorldSelector WorldSelector = new()
     {
         DisplayCurrent = false,
-        EmptyName = "Disabled",
+        EmptyName = "禁用",
         ShouldHideWorld = (x) => x == Player.Object?.CurrentWorld.RowId
     };
     private static PaissaImporter PaissaImporter = new();
@@ -18,13 +18,13 @@ public static class TabUtility
     public static void Draw()
     {
         new NuiBuilder()
-            .Section("Shutdown game upon arriving to the world")
+            .Section("抵达服务器后关闭游戏")
             .Widget(() =>
             {
                 ImGuiEx.SetNextItemFullWidth();
                 WorldSelector.Draw(ref TargetWorldID);
             })
-            .Section("Import house listings from PaissaDB")
+            .Section("从 PaissaDB 导入房屋清单")
             .Widget(() =>
             {
                 ImGuiEx.SetNextItemFullWidth();

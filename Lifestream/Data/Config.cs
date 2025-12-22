@@ -17,8 +17,8 @@ public class Config : IEzConfig
     public bool UseMapTeleport = true;
     public bool HideAddon = true;
     public HashSet<string> HideAddonList = [.. Utils.DefaultAddons];
-    public BasePositionHorizontal PosHorizontal = BasePositionHorizontal.Middle;
-    public BasePositionVertical PosVertical = BasePositionVertical.Middle;
+    public BasePositionHorizontal PosHorizontal = BasePositionHorizontal.中间;
+    public BasePositionVertical PosVertical = BasePositionVertical.中间;
     public bool ShowAethernet = true;
     public bool ShowWorldVisit = true;
     public HashSet<uint> Favorites = [];
@@ -61,10 +61,10 @@ public class Config : IEzConfig
     public List<HousePathData> HousePathDatas = [];
     public List<HousePathData> CustomHousePathDatas = [];
     public bool EnterMyApartment = true;
-    public HouseEnterMode HouseEnterMode = HouseEnterMode.None;
+    public HouseEnterMode HouseEnterMode = HouseEnterMode.无;
     public bool UseReturn = true;
     public uint PreferredInn = 0;
-    public List<AutoPropertyData> PropertyPrio = [new(true, TaskPropertyShortcut.PropertyType.Home), new(true, TaskPropertyShortcut.PropertyType.FC), new(true, TaskPropertyShortcut.PropertyType.Apartment), new(true, TaskPropertyShortcut.PropertyType.Inn), new(false, TaskPropertyShortcut.PropertyType.Shared_Estate)];
+    public List<AutoPropertyData> PropertyPrio = [new(true, TaskPropertyShortcut.PropertyType.个人房屋), new(true, TaskPropertyShortcut.PropertyType.部队房屋), new(true, TaskPropertyShortcut.PropertyType.公寓), new(true, TaskPropertyShortcut.PropertyType.旅馆), new(false, TaskPropertyShortcut.PropertyType.共享房屋)];
     public Dictionary<ulong, List<AutoPropertyData>> PropertyPrioOverrides = [];
     public bool EnableDvcRetry = true;
     public int MaxDcvRetries = 3000;
@@ -87,7 +87,7 @@ public class Config : IEzConfig
     public Dictionary<ulong, (int Territory, int Ward, int Plot)> PreferredSharedEstates = [];
     public bool LeftAlignButtons = false;
     public int LeftAlignPadding = 0;
-    public LiCommandBehavior LiCommandBehavior = LiCommandBehavior.Return_to_Home_World;
+    public LiCommandBehavior LiCommandBehavior = LiCommandBehavior.返回原始服务器;
     public bool EnableNotifications = true;
     public bool ProgressOverlayToTop = false;
     public bool AllowCustomOverrides = false;

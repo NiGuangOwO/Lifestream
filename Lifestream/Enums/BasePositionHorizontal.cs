@@ -2,5 +2,5 @@
 
 public enum BasePositionHorizontal
 {
-    Middle, Left, Right
+    中间, 左边, 右边
 }

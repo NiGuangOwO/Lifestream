@@ -1,8 +1,8 @@
-﻿using ECommons.GameHelpers;
-using Lifestream.Data;
+﻿using Lifestream.Data;
 using NightmareUI.ImGuiElements;
 
 namespace Lifestream.GUI;
+
 public static class TabTravelBan
 {
     public static void Draw()
@@ -12,14 +12,14 @@ public static class TabTravelBan
         ImGuiEx.Text(EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());
         ImGui.PopFont();
         ImGui.SameLine();
-        ImGuiEx.TextWrapped(EColor.RedBright, "Be mindful that this function is meant to be the last chance to avoid unrecoverable mistakes. Using this function may break other plugins that rely on Lifestream. Blocking travel in a specific direction will block it only via Lifestream. You can still travel manually.");
+        ImGuiEx.TextWrapped(EColor.RedBright, "请注意，此功能旨在避免造成无法挽回的错误。使用此功能可能会破坏其他依赖 Lifestream 的插件。阻止特定方向的移动只会通过 Lifestream 阻止，您仍然可以手动移动。");
 
         ImGuiEx.LineCentered(() =>
         {
-            if(ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "Add new entry"))
+            if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "添加新条目"))
             {
                 var entry = new TravelBanInfo();
-                if(Player.Available)
+                if (Player.Available)
                 {
                     entry.CharaName = Player.Name;
                     entry.CharaHomeWorld = (int)Player.Object.HomeWorld.RowId;
@@ -27,16 +27,16 @@ public static class TabTravelBan
                 C.TravelBans.Add(entry);
             }
         });
-        if(ImGui.BeginTable("Bantable", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
+        if (ImGui.BeginTable("Bantable", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Borders))
         {
             ImGui.TableSetupColumn("##enabled");
-            ImGui.TableSetupColumn("Character name and world", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("Travel source");
-            ImGui.TableSetupColumn("Travel destination");
+            ImGui.TableSetupColumn("角色名称和服务器", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("旅行出发地");
+            ImGui.TableSetupColumn("旅行目的地");
             ImGui.TableSetupColumn("##control");
 
             ImGui.TableHeadersRow();
-            for(var i = 0; i < C.TravelBans.Count; i++)
+            for (var i = 0; i < C.TravelBans.Count; i++)
             {
                 var entry = C.TravelBans[i];
                 ImGui.PushID(entry.ID);
@@ -57,7 +57,7 @@ public static class TabTravelBan
                 ImGui.TableNextColumn();
 
                 ImGui.SetNextItemWidth(100f.Scale());
-                if(ImGui.BeginCombo("##from", $"{entry.BannedFrom.Count} worlds", ImGuiComboFlags.HeightLarge))
+                if (ImGui.BeginCombo("##from", $"{entry.BannedFrom.Count} worlds", ImGuiComboFlags.HeightLarge))
                 {
                     Utils.DrawWorldSelector(entry.BannedFrom);
                     ImGui.EndCombo();
@@ -65,14 +65,14 @@ public static class TabTravelBan
                 ImGui.TableNextColumn();
 
                 ImGui.SetNextItemWidth(100f.Scale());
-                if(ImGui.BeginCombo("##to", $"{entry.BannedTo.Count} worlds", ImGuiComboFlags.HeightLarge))
+                if (ImGui.BeginCombo("##to", $"{entry.BannedTo.Count} worlds", ImGuiComboFlags.HeightLarge))
                 {
                     Utils.DrawWorldSelector(entry.BannedTo);
                     ImGui.EndCombo();
                 }
                 ImGui.TableNextColumn();
 
-                if(ImGuiEx.IconButton(FontAwesomeIcon.Trash))
+                if (ImGuiEx.IconButton(FontAwesomeIcon.Trash))
                 {
                     new TickScheduler(() => C.TravelBans.Remove(entry));
                 }

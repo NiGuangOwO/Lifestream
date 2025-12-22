@@ -1,5 +1,4 @@
 ﻿using Dalamud.Utility;
-using ECommons.GameHelpers;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using Lifestream.Data;
 using Lifestream.Tasks.SameWorld;
@@ -48,31 +47,31 @@ public static class WotsitEntryGenerator
     {
         var includes = C.WotsitIntegrationIncludes;
 
-        foreach(var entry in Generic(includes))
+        foreach (var entry in Generic(includes))
         {
             yield return entry;
         }
 
         // TODO: eventually residential aethernet could be added too
-        if(includes.AetheryteAethernet)
+        if (includes.AetheryteAethernet)
         {
-            foreach(var entry in AetheryteAethernetTeleport())
+            foreach (var entry in AetheryteAethernetTeleport())
             {
                 yield return entry;
             }
         }
 
-        if(includes.AddressBook)
+        if (includes.AddressBook)
         {
-            foreach(var entry in AddressBook())
+            foreach (var entry in AddressBook())
             {
                 yield return entry;
             }
         }
 
-        if(includes.CustomAlias)
+        if (includes.CustomAlias)
         {
-            foreach(var entry in CustomAlias())
+            foreach (var entry in CustomAlias())
             {
                 yield return entry;
             }
@@ -81,20 +80,20 @@ public static class WotsitEntryGenerator
 
     private static IEnumerable<WotsitEntry> Generic(WotsitIntegrationIncludedItems includes)
     {
-        if(Player.CID != 0 && TaskPropertyShortcut.GetPrivateHouseAetheryteID() != 0)
+        if (Player.CID != 0 && TaskPropertyShortcut.GetPrivateHouseAetheryteID() != 0)
         {
             HasPrivateEstate.Add(Player.CID);
         }
-        if(Player.CID != 0 && TaskPropertyShortcut.GetFreeCompanyAetheryteID() != 0)
+        if (Player.CID != 0 && TaskPropertyShortcut.GetFreeCompanyAetheryteID() != 0)
         {
             HasFreeCompanyEstate.Add(Player.CID);
         }
-        if(Player.CID != 0 && TaskPropertyShortcut.GetApartmentAetheryteID().ID != 0)
+        if (Player.CID != 0 && TaskPropertyShortcut.GetApartmentAetheryteID().ID != 0)
         {
             HasApartment.Add(Player.CID);
         }
 
-        if(includes.WorldSelect)
+        if (includes.WorldSelect)
         {
             yield return new WotsitEntry
             {
@@ -104,47 +103,47 @@ public static class WotsitEntryGenerator
                 Callback = () => S.Gui.SelectWorldWindow.IsOpen = true,
             };
         }
-        if(includes.PropertyAuto)
+        if (includes.PropertyAuto)
         {
             yield return new WotsitEntry
             {
                 DisplayName = "Auto-teleport to property",
                 SearchString = "auto-teleport to property",
                 IconId = 52,
-                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.Auto),
+                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.自动),
             };
         }
-        if(includes.PropertyPrivate && HasPrivateEstate.Contains(Player.CID))
+        if (includes.PropertyPrivate && HasPrivateEstate.Contains(Player.CID))
         {
             yield return new WotsitEntry
             {
                 DisplayName = "Teleport to your private estate",
                 SearchString = "teleport to your private estate - teleport to home",
                 IconId = 52,
-                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.Home),
+                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.个人房屋),
             };
         }
-        if(includes.PropertyFreeCompany && HasFreeCompanyEstate.Contains(Player.CID))
+        if (includes.PropertyFreeCompany && HasFreeCompanyEstate.Contains(Player.CID))
         {
             yield return new WotsitEntry
             {
                 DisplayName = "Teleport to your free company estate",
                 SearchString = "teleport to your free company estate - teleport to fc",
                 IconId = 52,
-                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.FC),
+                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.部队房屋),
             };
         }
-        if(includes.PropertyApartment && HasApartment.Contains(Player.CID))
+        if (includes.PropertyApartment && HasApartment.Contains(Player.CID))
         {
             yield return new WotsitEntry
             {
                 DisplayName = "Teleport to your apartment",
                 SearchString = "teleport to your apartment",
                 IconId = 52,
-                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.Apartment),
+                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.公寓),
             };
         }
-        if(includes.PropertyInn)
+        if (includes.PropertyInn)
         {
             // TODO: each inn could be a separate entry in the future
             yield return new WotsitEntry
@@ -152,11 +151,11 @@ public static class WotsitEntryGenerator
                 DisplayName = "Teleport to an inn room",
                 SearchString = "teleport to an inn room",
                 IconId = 88,
-                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.Inn),
+                Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.旅馆),
             };
         }
         // TODO: each grand company could be a separate entry in the future
-        if(includes.GrandCompany && Player.GrandCompany != GrandCompany.Unemployed)
+        if (includes.GrandCompany && Player.GrandCompany != GrandCompany.Unemployed)
         {
             var (name, icon) = Player.GrandCompany switch
             {
@@ -173,7 +172,7 @@ public static class WotsitEntryGenerator
                 Callback = () => TaskGCShortcut.Enqueue(Player.GrandCompany),
             };
         }
-        if(includes.MarketBoard)
+        if (includes.MarketBoard)
         {
             yield return new WotsitEntry
             {
@@ -184,7 +183,7 @@ public static class WotsitEntryGenerator
             };
         }
         // TODO: the NPCs on the island sanctuary could get their own entries
-        if(includes.IslandSanctuary)
+        if (includes.IslandSanctuary)
         {
             yield return new WotsitEntry
             {
@@ -201,34 +200,34 @@ public static class WotsitEntryGenerator
         // Avoid spoilers by not showing aetherytes that the player hasn't
         // attuned to.
         uint[] visibleAetheryteIds = [];
-        if(Player.Available)
+        if (Player.Available)
         {
             unsafe
             {
                 var visibleAetherytes = Telepo.Instance()->UpdateAetheryteList();
-                if(visibleAetherytes != null)
+                if (visibleAetherytes != null)
                 {
                     visibleAetheryteIds = visibleAetherytes->Select(x => x.AetheryteId).ToArray();
                 }
             }
         }
 
-        foreach(var (rootAetheryte, aethernetShards) in S.Data.DataStore.Aetherytes)
+        foreach (var (rootAetheryte, aethernetShards) in S.Data.DataStore.Aetherytes)
         {
-            if(visibleAetheryteIds.Length > 0 && !visibleAetheryteIds.Contains(rootAetheryte.ID))
+            if (visibleAetheryteIds.Length > 0 && !visibleAetheryteIds.Contains(rootAetheryte.ID))
             {
                 PluginLog.Debug($"WotsitEntryGenerator.AetheryteAethernetTeleport: Skipping aetheryte {rootAetheryte.ID} ({rootAetheryte.Name}) because it is not visible");
                 continue;
             }
 
             string townName = null;
-            if(AetheryteToTownPlaceName.TryGetValue(rootAetheryte.ID, out var placeId))
+            if (AetheryteToTownPlaceName.TryGetValue(rootAetheryte.ID, out var placeId))
             {
                 townName = Svc.Data.GetExcelSheet<PlaceName>().GetRow(placeId).Name.ToDalamudString().GetText();
             }
-            foreach(var aethernetShard in aethernetShards)
+            foreach (var aethernetShard in aethernetShards)
             {
-                if(!C.Hidden.Contains(aethernetShard.ID) && (!aethernetShard.Invisible || InvisibleWhitelist.Contains(aethernetShard.ID)))
+                if (!C.Hidden.Contains(aethernetShard.ID) && (!aethernetShard.Invisible || InvisibleWhitelist.Contains(aethernetShard.ID)))
                 {
                     var name = C.Renames.TryGetValue(aethernetShard.ID, out var value) ? value : aethernetShard.Name;
                     yield return WotsitEntry.AetheryteAethernetTeleport(townName, name, rootAetheryte.ID, aethernetShard.ID);
@@ -236,7 +235,7 @@ public static class WotsitEntryGenerator
             }
 
             // Special case for The Firmament
-            if(C.Firmament && rootAetheryte.TerritoryType == 418)
+            if (C.Firmament && rootAetheryte.TerritoryType == 418)
             {
                 var placeName = Svc.Data.GetExcelSheet<PlaceName>().GetRow(3435).Name.ToDalamudString().GetText();
                 yield return WotsitEntry.AetheryteAethernetTeleport(townName, placeName, rootAetheryte.ID, TaskAetheryteAethernetTeleport.FirmamentAethernetId);
@@ -246,7 +245,7 @@ public static class WotsitEntryGenerator
 
     private static IEnumerable<WotsitEntry> AddressBook()
     {
-        foreach(var entry in C.AddressBookFolders.SelectMany(folder => folder.Entries))
+        foreach (var entry in C.AddressBookFolders.SelectMany(folder => folder.Entries))
         {
             var searchStr = entry.Name + (!string.IsNullOrEmpty(entry.Alias) && entry.Alias != entry.Name ? " - " + entry.Alias : "");
             yield return new WotsitEntry
@@ -261,7 +260,7 @@ public static class WotsitEntryGenerator
 
     private static IEnumerable<WotsitEntry> CustomAlias()
     {
-        foreach(var alias in C.CustomAliases.Where(a => a.Enabled && !string.IsNullOrEmpty(a.Alias)))
+        foreach (var alias in C.CustomAliases.Where(a => a.Enabled && !string.IsNullOrEmpty(a.Alias)))
         {
             yield return new WotsitEntry
             {

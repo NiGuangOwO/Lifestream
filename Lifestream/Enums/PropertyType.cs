@@ -1,5 +1,6 @@
 ﻿namespace Lifestream.Enums;
+
 public enum PropertyType
 {
-    House, Apartment
+    房屋, 公寓
 }

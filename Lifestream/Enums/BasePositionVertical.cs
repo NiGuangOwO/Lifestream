@@ -2,5 +2,5 @@
 
 public enum BasePositionVertical
 {
-    Middle, Top, Bottom
+    中间, 顶部, 底部
 }

@@ -1,6 +1,7 @@
 ﻿using Lifestream.Enums;
 
 namespace Lifestream.Data;
+
 [Serializable]
 public class HousePathData
 {
@@ -12,5 +13,5 @@ public class HousePathData
     public bool IsPrivate;
     public ulong CID;
     public bool EnableHouseEnterModeOverride = false;
-    public HouseEnterMode EnterModeOverride = HouseEnterMode.None;
+    public HouseEnterMode EnterModeOverride = HouseEnterMode.无;
 }

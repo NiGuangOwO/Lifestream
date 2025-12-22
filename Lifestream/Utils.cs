@@ -1301,20 +1301,21 @@ internal static unsafe partial class Utils
         builder.Append(ExcelWorldHelper.GetName(entry.World));
         builder.Append(", ");
         builder.Append(TabAddressBook.ResidentialNames.SafeSelect(entry.City) ?? "???");
-        builder.Append(", Ward ");
+        builder.Append(", ");
         builder.Append(entry.Ward);
         if (entry.PropertyType == PropertyType.房屋)
         {
-            builder.Append(", Plot ");
+            builder.Append("区, ");
             builder.Append(entry.Plot);
+            builder.Append("号");
         }
         if (entry.PropertyType == PropertyType.公寓)
         {
-            builder.Append(", Apartment ");
+            builder.Append(", 公寓 ");
             builder.Append(entry.Apartment);
             if (entry.ApartmentSubdivision)
             {
-                builder.Append(" (subdivision)");
+                builder.Append(" (扩建区)");
             }
         }
         return builder.ToString();

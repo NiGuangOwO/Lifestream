@@ -78,7 +78,7 @@ internal static class Lang
         internal const string HighQuality = "";
     }
 
-    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登录吗？", "登入嗎？", "접속하시겠습니까?", "登錄嗎"];
+    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗？", "登入嗎？", "접속하시겠습니까?", "登錄嗎", "登录吗"];
 
     /*
     1	TEXT_AETHERYTE_TOWN_WARP<Gui(69)/> Aethernet.
@@ -158,4 +158,6 @@ internal static class Lang
         ];
 
     public static readonly string AethernetShardTooltipPlaceholder = Svc.Data.GetExcelSheet<PlaceName>().GetRow(1300).Name.GetText();
+
+    public static readonly string[] RemainingSubTime = ["sqex.to/Msp"];
 }

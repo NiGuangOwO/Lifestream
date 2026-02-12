@@ -1,6 +1,8 @@
+using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
+using ECommons;
 using ECommons.Automation;
 using ECommons.ChatMethods;
 using ECommons.Configuration;
@@ -43,6 +45,15 @@ internal static unsafe partial class Utils
 {
     public static string[] LifestreamNativeCommands = ["auto", "home", "house", "private", "fc", "free", "company", "free company", "apartment", "apt", "shared", "inn", "hinn", "gc", "gcc", "hc", "hcc", "fcgc", "gcfc", "mb", "market", "island", "is", "sanctuary", "cosmic", "ardorum", "moon", "tp"];
 
+    public static bool IsQueuePopupVisible()
+    {
+        if(TryGetAddonMaster<AddonMaster.SelectOk>(out var m) && m.IsAddonReady)
+        {
+            var text = m.Text;
+            return text.RemoveWhitespaces().Contains(Error.Get(13206).Unknown0.GetText(true).RemoveWhitespaces(), StringComparison.OrdinalIgnoreCase);
+        }
+        return false;
+    }
 
     public static ErrorCode ChangeCharacter(string charaName, string charaHomeWorld)
     {
@@ -935,7 +946,44 @@ internal static unsafe partial class Utils
         return true;
     }
 
-    public static uint[] AethernetShards = [2000151, 2000153, 2000154, 2000155, 2000156, 2000157, 2003395, 2003396, 2003397, 2003398, 2003399, 2003400, 2003401, 2003402, 2003403, 2003404, 2003405, 2003406, 2003407, 2003408, 2003409, 2003995, 2003996, 2003997, 2003998, 2003999, 2004000, 2004968, 2004969, 2004970, 2004971, 2004972, 2004973, 2004974, 2004976, 2004977, 2004978, 2004979, 2004980, 2004981, 2004982, 2004983, 2004984, 2004985, 2004986, 2004987, 2004988, 2004989, 2007434, 2007435, 2007436, 2007437, 2007438, 2007439, 2007855, 2007856, 2007857, 2007858, 2007859, 2007860, 2007861, 2007862, 2007863, 2007864, 2007865, 2007866, 2007867, 2007868, 2007869, 2007870, 2009421, 2009432, 2009433, 2009562, 2009563, 2009564, 2009565, 2009615, 2009616, 2009617, 2009618, 2009713, 2009714, 2009715, 2009981, 2010135, 2011142, 2011162, 2011163, 2011241, 2011243, 2011373, 2011374, 2011384, 2011385, 2011386, 2011387, 2011388, 2011389, 2011573, 2011574, 2011575, 2011677, 2011678, 2011679, 2011680, 2011681, 2011682, 2011683, 2011684, 2011685, 2011686, 2011687, 2011688, 2011689, 2011690, 2011691, 2011692, 2012252, 2012253, 2011160, 2011572, 2014664, 2014744, 2014665, 2014666, 2014667,];
+    public static uint[] AethernetShards
+    {
+        get
+        {
+            if(field == null)
+            {
+                HashSet<uint> ret = [];
+                foreach(var x in EObjName.Values)
+                {
+                    //2000151	Aethernet shard	0	Aethernet shards	0	1	1	0	0
+                    //2014665	aetheryte shard	0	aetheryte shards	0	1	1	0	0
+                    if(x.Singular.GetText().EqualsAny(EObjName.Get(2000151).Singular.GetText(), EObjName.Get(2014665).Singular.GetText()))
+                    {
+                        ret.Add(x.RowId);
+                    }
+                }
+                try
+                {
+                    foreach(var x in Svc.Data.GetExcelSheet<EObjName>(ClientLanguage.English))
+                    {
+                        //2000151	Aethernet shard	0	Aethernet shards	0	1	1	0	0
+                        //2014665	aetheryte shard	0	aetheryte shards	0	1	1	0	0
+                        if(x.Singular.GetText().EqualsAny(EObjName.Get(2000151, ClientLanguage.English).Singular.GetText(), EObjName.Get(2014665, ClientLanguage.English).Singular.GetText()))
+                        {
+                            ret.Add(x.RowId);
+                        }
+                    }
+                }
+                catch(Exception e)
+                {
+                    //??
+                    e.LogInfo();
+                }
+                field = ret.ToArray();
+            }
+            return field;
+        }
+    }
 
     public static uint[] HousingAethernet = [MainCities.Limsa_Lominsa_Lower_Decks, MainCities.Uldah_Steps_of_Nald, MainCities.New_Gridania, MainCities.Foundation, MainCities.Kugane];
 
@@ -1195,11 +1243,38 @@ internal static unsafe partial class Utils
         }
         if (entry.PropertyType == PropertyType.公寓)
         {
-            if (entry.ApartmentSubdivision && h->GetCurrentDivision() != 2)
-                return false;
+            // Better logic for subdivision detection
+            if(!(entry.ApartmentSubdivision == ((h->IsInside() ? h->GetCurrentHouseId().Unit.ApartmentDivision : h->GetCurrentDivision() - 1) == 1))) return false;
             return entry.Apartment == h->GetCurrentRoom();
         }
         return false;
+    }
+
+    // A version of IsHere that is not strict about if we are indoors or not for apartments.
+    public static bool IsAtAddress(this AddressBookEntry entry)
+    {
+        var h = HousingManager.Instance();
+        if(h == null) return false;
+        if(h->GetCurrentWard() != entry.Ward - 1) return false;
+        if(GetResidentialAetheryteByTerritoryType(P.Territory) != entry.City) return false;
+        if(entry.PropertyType is PropertyType.House)
+        {
+            return h->GetCurrentPlot() == entry.Plot - 1;
+        }
+        else
+        {
+            return entry.ApartmentSubdivision == ((h->IsInside() ? h->GetCurrentHouseId().Unit.ApartmentDivision : h->GetCurrentDivision() - 1) == 1);
+        }
+    }
+
+    // Determines the other half of IsHere that IsAtAddress doesnt check.
+    // Can determine if it does the full IsHere logic or not with checkAddress.
+    public static bool IsInsideApartment(this AddressBookEntry entry, bool checkAddress)
+    {
+        if(entry.PropertyType == PropertyType.House) return false;
+        if(checkAddress && !IsAtAddress(entry)) return false;
+        var h = HousingManager.Instance();
+        return h != null && h->IsInside() && h->GetCurrentRoom() == entry.Apartment;
     }
 
     public static bool IsQuickTravelAvailable(this AddressBookEntry entry)
@@ -1222,6 +1297,33 @@ internal static unsafe partial class Utils
             Notify.Error($"Can not travel to {ExcelWorldHelper.GetName(entry.World)}");
             return;
         }
+        // Check first if already at our destination.
+        if(IsAtAddress(entry))
+        {
+            // We dont need to do anything if at our house, but if at our address we do.
+            if(entry.PropertyType == PropertyType.House)
+            {
+                return;
+            }
+            else if(entry.PropertyType == PropertyType.Apartment)
+            {
+                if(IsInsideApartment(entry, false))
+                {
+                    return;
+                }
+                // We were infront of the apartment, so attempt the automation from the door. If it fails, fallback
+                else if(TaskApproachAndInteractWithApartmentEntrance.TargetApartmentEntrance())
+                {
+                    TaskApproachAndInteractWithApartmentEntrance.Enqueue(false);
+                    P.TaskManager.Enqueue(TaskTpAndGoToWard.SelectGoToSpecifiedApartment);
+                    P.TaskManager.Enqueue(() => TaskTpAndGoToWard.SelectApartment(entry.Apartment - 1), $"SelectApartment {entry.Apartment - 1}");
+                    if(!C.AddressApartmentNoEntry) P.TaskManager.Enqueue(TaskTpAndGoToWard.ConfirmApartmentEnterYesno);
+                    return;
+                }
+            }
+        }
+
+        // Do not else if this as the above may need to flow down to these logic.
         if (entry.IsQuickTravelAvailable())
         {
             if (entry.PropertyType == PropertyType.房屋)

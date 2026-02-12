@@ -90,52 +90,69 @@ public static class TabCustomAlias
         PostTableActions.Clear();
         if (ImGuiEx.BeginDefaultTable(["Control", "~Command"], false))
         {
-            for (var i = 0; i < selected.Commands.Count; i++)
+            for(var selectedCommandIndex = 0; selectedCommandIndex < selected.Commands.Count; selectedCommandIndex++)
             {
-                var x = selected.Commands[i];
-                var index = i;
+                var selectedCommand = selected.Commands[selectedCommandIndex];
+                var index = selectedCommandIndex;
 
                 ImGui.TableNextRow();
-                DragDrop.SetRowColor(x.ID);
+                DragDrop.SetRowColor(selectedCommand.ID);
                 ImGui.TableNextColumn();
                 DragDrop.NextRow();
-                DragDrop.DrawButtonDummy(x, selected.Commands, i);
+                DragDrop.DrawButtonDummy(selectedCommand, selected.Commands, selectedCommandIndex);
                 ImGui.TableNextColumn();
                 var curpos = ImGui.GetCursorPos() + ImGui.GetContentRegionAvail() with { Y = 0 };
-                if (x.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point, CustomAliasKind.Circular_movement))
+
+                var insertIndex = selectedCommandIndex + 1;
+                PostTableActions.Add(() =>
                 {
-                    var insertIndex = i + 1;
-                    PostTableActions.Add(() =>
+                    if(selectedCommand.Kind.EqualsAny(CustomAliasKind.Move_to_point, CustomAliasKind.Navmesh_to_point, CustomAliasKind.Circular_movement))
                     {
                         ImGui.PushFont(UiBuilder.IconFont);
                         var pos = curpos
                             - ImGuiHelpers.GetButtonSize("\uf0ab") with { Y = 0 }
-                            - new Vector2(ImGui.CalcTextSize(FontAwesomeIcon.Link.ToIconString()).X + ImGui.GetStyle().ItemSpacing.X, 0);
+                            - ImGuiHelpers.GetButtonSize(FontAwesomeIcon.Clone.ToIconString()) with { Y = 0 }
+                            - new Vector2(ImGui.CalcTextSize(FontAwesomeIcon.Link.ToIconString()).X + ImGui.GetStyle().ItemSpacing.X * 2, 0);
                         ImGui.SetCursorPos(pos);
                         ImGui.PopFont();
                         ImGui.AlignTextToFramePadding();
-                        var col = x.ChainGroup == 0 ? Vector4.Zero : TabCustomAlias.ChainColors.SafeSelect(x.ChainGroup - 1);
+                        var col = selectedCommand.ChainGroup == 0 ? Vector4.Zero : TabCustomAlias.ChainColors.SafeSelect(selectedCommand.ChainGroup - 1);
                         ImGuiEx.Text(col, UiBuilder.IconFont, FontAwesomeIcon.Link.ToIconString());
                         ImGui.SameLine();
-                        if (ImGuiEx.IconButton((FontAwesomeIcon)'\uf0ab', x.ID, enabled: Player.Available))
+                        if(ImGuiEx.IconButton((FontAwesomeIcon)'\uf0ab', selectedCommand.ID, enabled: Player.Available))
                         {
                             new TickScheduler(() =>
                             {
                                 selected.Commands.Insert(insertIndex, new()
                                 {
                                     Kind = CustomAliasKind.Move_to_point,
-                                    UseFlight = x.UseFlight,
+                                    UseFlight = selectedCommand.UseFlight,
                                     Point = Player.Position,
-                                    Territory = Player.Territory == x.Territory ? x.Territory : (Player.Available ? Player.Territory : 0),
+                                    Territory = Player.Territory == selectedCommand.Territory ? selectedCommand.Territory : (Player.Available ? Player.Territory : 0),
                                 });
                             });
                         }
                         ImGuiEx.Tooltip($"在此命令之后，创建包含玩家位置和房屋信息的移动命令。");
-                    });
-                }
+                        ImGui.SameLine();
+                    }
+                    else
+                    {
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        var pos = curpos
+                            - ImGuiHelpers.GetButtonSize(FontAwesomeIcon.Clone.ToIconString()) with { Y = 0 };
+                        ImGui.SetCursorPos(pos);
+                        ImGui.PopFont();
+                        ImGui.AlignTextToFramePadding();
+                    }
+                    if(ImGuiEx.IconButton(FontAwesomeIcon.Clone, selectedCommand.ID + "Clone"))
+                    {
+                        selected.Commands.Add(selectedCommand.DSFClone());
+                    }
+                    ImGuiEx.Tooltip("复制此命令并将其添加到列表末尾");
+                });
 
-                ImGuiEx.TreeNodeCollapsingHeader($"Command {i + 1}: {x.Kind.ToString().Replace('_', ' ')}{GetExtraText(x)}###{x.ID}", () => DrawCommand(x, selected, i), ImGuiTreeNodeFlags.CollapsingHeader);
-                DrawSplatoon(x, i);
+                ImGuiEx.TreeNodeCollapsingHeader($"Command {selectedCommandIndex + 1}: {selectedCommand.Kind.ToString().Replace('_', ' ')}{GetExtraText(selectedCommand)}###{selectedCommand.ID}", () => DrawCommand(selectedCommand, selected, selectedCommandIndex), ImGuiTreeNodeFlags.CollapsingHeader);
+                DrawSplatoon(selectedCommand, selectedCommandIndex);
             }
             ImGui.EndTable();
         }
@@ -557,10 +574,15 @@ public static class TabCustomAlias
         {
             ImGui.Checkbox("仅当在配置中启用时才骑乘", ref command.MountUpConditional);
         }
-        if (command.Kind.EqualsAny(CustomAliasKind.Select_Yes, CustomAliasKind.Select_List_Option))
+        if(command.Kind.EqualsAny(CustomAliasKind.Select_Yes, CustomAliasKind.Select_List_Option, CustomAliasKind.Close_UI))
         {
-            ImGuiEx.TextWrapped($"请列出您想要选择/确认的条目:");
-            if (ImGuiEx.BeginDefaultTable("ItemLst", ["~1", "2"], false))
+            ImGuiEx.TextWrapped(command.Kind switch
+            {
+                CustomAliasKind.Select_Yes => "在弹出的窗口中输入您要确认的问题（部分文本即可）：",
+                CustomAliasKind.Close_UI => "请输入要关闭的插件名称（必须完全匹配）",
+                _ => $"请列出您想要选择/确认的条目："
+            });
+            if(ImGuiEx.BeginDefaultTable("ItemLst", ["~1", "2"], false))
             {
                 for (var i = 0; i < command.SelectOption.Count; i++)
                 {
@@ -588,7 +610,15 @@ public static class TabCustomAlias
                 }
             }
         }
-        if (command.Kind.EqualsAny(CustomAliasKind.Select_Yes, CustomAliasKind.Select_List_Option, CustomAliasKind.Confirm_Contents_Finder))
+
+        if(command.Kind.Equals(CustomAliasKind.Close_UI))
+        {
+            ImGui.Checkbox("请等待用户界面打开后再进行下一步操作", ref command.RequireUiOpen);
+            ImGui.SetNextItemWidth(150f);
+            ImGuiEx.SliderIntAsFloat("超时时间（秒）", ref command.Timeout, 2000, 10000);
+        }
+
+        if(command.Kind.EqualsAny(CustomAliasKind.Select_Yes, CustomAliasKind.Select_List_Option, CustomAliasKind.Confirm_Contents_Finder))
         {
             ImGui.Checkbox("跳过屏幕淡出", ref command.StopOnScreenFade);
         }

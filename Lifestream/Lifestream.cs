@@ -151,6 +151,10 @@ public unsafe class Lifestream : IDalamudPlugin
                     Notify.Error("Lifestream 很忙");
                 }
             }
+            else
+            {
+                DuoLog.Error($"Could not recognize world {spl[1]}");
+            }
         }
         else if (arguments.StartsWith("debug TaskAetheryteAethernetTeleport "))
         {
@@ -585,9 +589,9 @@ public unsafe class Lifestream : IDalamudPlugin
         }
         if (P.TaskManager.IsBusy)
         {
-            if (EzThrottler.Throttle("EnsureEnhancedLoginIsOff"))
-                Utils.EnsureEnhancedLoginIsOff();
-            if (TryGetAddonByName<AtkUnitBase>("Trade", out var trade))
+            MiniTA.Tick();
+            if(EzThrottler.Throttle("EnsureEnhancedLoginIsOff")) Utils.EnsureEnhancedLoginIsOff();
+            if(TryGetAddonByName<AtkUnitBase>("Trade", out var trade))
             {
                 Callback.Fire(trade, true, -1);
             }

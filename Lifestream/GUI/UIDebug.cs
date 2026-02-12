@@ -341,6 +341,30 @@ internal static unsafe class UIDebug
 
     private static void Debug()
     {
+        if(ImGui.CollapsingHeader("World test"))
+        {
+            try
+            {
+                if(Player.Available)
+                {
+                    ImGuiEx.TextCopy($"DC: {Player.Object.CurrentWorld.Value.DataCenter.RowId}");
+                    ImGuiEx.TextCopy($"Worlds: {Svc.Data.GetExcelSheet<World>().Where(x => x.DataCenter.RowId == Player.Object.CurrentWorld.Value.DataCenter.RowId).Select(x => x.RowId).Print()}");
+                    foreach(var x in Svc.Data.GetExcelSheet<World>())
+                    {
+                        if(x.DataCenter.RowId == Player.Object.CurrentWorld.Value.DataCenter.RowId)
+                        {
+                            ImGuiEx.Text($"{x.RowId} : {x.Name}");
+                        }
+                    }
+                }
+                ImGuiEx.Text($"Public worlds:");
+                ImGuiEx.Text(Lumina.Excel.Sheets.World.Values.Where(x => x.IsPublic()).Select(x => $"{x.RowId} {x.Name} {x.Region} {x.UserType}").Print("\n"));
+            }
+            catch(Exception e)
+            {
+                ImGuiEx.TextWrapped(e.ToStringFull());
+            }
+        }
         if(ImGui.CollapsingHeader("Image test"))
         {
             if(ThreadLoadImageHandler.TryGetTextureWrap("https://github.com/FFXIV-CombatReborn/RotationSolverReborn/blob/main/Images/Logo.png?raw=true", out var tex))
@@ -501,8 +525,10 @@ internal static unsafe class UIDebug
             {
                 var pname = TerritoryInfo.Instance()->AreaPlaceNameId;
                 var pname2 = TerritoryInfo.Instance()->SubAreaPlaceNameId;
+                var placeNames = PlaceName.Values.Where(x => x.Name.GetText() == PlaceName.GetRef(pname).ValueNullable?.Name.GetText());
+                var placeNames2 = PlaceName.Values.Where(x => x.Name.GetText() == PlaceName.GetRef(pname2).ValueNullable?.Name.GetText());
                 Copy($"""
-                    new(new({Svc.Targets.Target.Position.X:F1}f, {Svc.Targets.Target.Position.Z:F1}f), {P.Territory}, GetPlaceName({pname}), Base), //{Svc.Data.GetExcelSheet<PlaceName>().GetRowOrDefault(pname)?.Name.GetText()} ({pname}), {Svc.Data.GetExcelSheet<PlaceName>().GetRowOrDefault(pname2)?.Name.GetText()} ({pname2}), 
+                    new(new({Svc.Targets.Target.Position.X:F1}f, {Svc.Targets.Target.Position.Z:F1}f), {P.Territory}, GetPlaceName({pname}), Base), //{Svc.Data.GetExcelSheet<PlaceName>().GetRowOrDefault(pname)?.Name.GetText()} ({placeNames.Select(x => x.RowId).Print()}), {Svc.Data.GetExcelSheet<PlaceName>().GetRowOrDefault(pname2)?.Name.GetText()} ({placeNames2.Select(x => x.RowId).Print()}), 
                     """);
             }
             ImGuiEx.Text($"Active: {S.Data.CustomAethernet.ActiveAetheryte}");

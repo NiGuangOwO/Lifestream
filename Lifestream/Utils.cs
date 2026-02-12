@@ -1257,7 +1257,7 @@ internal static unsafe partial class Utils
         if(h == null) return false;
         if(h->GetCurrentWard() != entry.Ward - 1) return false;
         if(GetResidentialAetheryteByTerritoryType(P.Territory) != entry.City) return false;
-        if(entry.PropertyType is PropertyType.House)
+        if(entry.PropertyType is PropertyType.房屋)
         {
             return h->GetCurrentPlot() == entry.Plot - 1;
         }
@@ -1271,7 +1271,7 @@ internal static unsafe partial class Utils
     // Can determine if it does the full IsHere logic or not with checkAddress.
     public static bool IsInsideApartment(this AddressBookEntry entry, bool checkAddress)
     {
-        if(entry.PropertyType == PropertyType.House) return false;
+        if(entry.PropertyType == PropertyType.房屋) return false;
         if(checkAddress && !IsAtAddress(entry)) return false;
         var h = HousingManager.Instance();
         return h != null && h->IsInside() && h->GetCurrentRoom() == entry.Apartment;
@@ -1301,11 +1301,11 @@ internal static unsafe partial class Utils
         if(IsAtAddress(entry))
         {
             // We dont need to do anything if at our house, but if at our address we do.
-            if(entry.PropertyType == PropertyType.House)
+            if(entry.PropertyType == PropertyType.房屋)
             {
                 return;
             }
-            else if(entry.PropertyType == PropertyType.Apartment)
+            else if(entry.PropertyType == PropertyType.公寓)
             {
                 if(IsInsideApartment(entry, false))
                 {

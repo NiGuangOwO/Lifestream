@@ -2,7 +2,6 @@ using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Memory;
-using ECommons;
 using ECommons.Automation;
 using ECommons.ChatMethods;
 using ECommons.Configuration;
@@ -47,7 +46,7 @@ internal static unsafe partial class Utils
 
     public static bool IsQueuePopupVisible()
     {
-        if(TryGetAddonMaster<AddonMaster.SelectOk>(out var m) && m.IsAddonReady)
+        if (TryGetAddonMaster<AddonMaster.SelectOk>(out var m) && m.IsAddonReady)
         {
             var text = m.Text;
             return text.RemoveWhitespaces().Contains(Error.Get(13206).Unknown0.GetText(true).RemoveWhitespaces(), StringComparison.OrdinalIgnoreCase);
@@ -950,31 +949,31 @@ internal static unsafe partial class Utils
     {
         get
         {
-            if(field == null)
+            if (field == null)
             {
                 HashSet<uint> ret = [];
-                foreach(var x in EObjName.Values)
+                foreach (var x in EObjName.Values)
                 {
                     //2000151	Aethernet shard	0	Aethernet shards	0	1	1	0	0
                     //2014665	aetheryte shard	0	aetheryte shards	0	1	1	0	0
-                    if(x.Singular.GetText().EqualsAny(EObjName.Get(2000151).Singular.GetText(), EObjName.Get(2014665).Singular.GetText()))
+                    if (x.Singular.GetText().EqualsAny(EObjName.Get(2000151).Singular.GetText(), EObjName.Get(2014664).Singular.GetText(), EObjName.Get(2014665).Singular.GetText()))
                     {
                         ret.Add(x.RowId);
                     }
                 }
                 try
                 {
-                    foreach(var x in Svc.Data.GetExcelSheet<EObjName>(ClientLanguage.English))
+                    foreach (var x in Svc.Data.GetExcelSheet<EObjName>(ClientLanguage.ChineseSimplified))
                     {
                         //2000151	Aethernet shard	0	Aethernet shards	0	1	1	0	0
                         //2014665	aetheryte shard	0	aetheryte shards	0	1	1	0	0
-                        if(x.Singular.GetText().EqualsAny(EObjName.Get(2000151, ClientLanguage.English).Singular.GetText(), EObjName.Get(2014665, ClientLanguage.English).Singular.GetText()))
+                        if (x.Singular.GetText().EqualsAny(EObjName.Get(2000151, ClientLanguage.ChineseSimplified).Singular.GetText(), EObjName.Get(2014664, ClientLanguage.ChineseSimplified).Singular.GetText(), EObjName.Get(2014665, ClientLanguage.ChineseSimplified).Singular.GetText()))
                         {
                             ret.Add(x.RowId);
                         }
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     //??
                     e.LogInfo();
@@ -1244,7 +1243,7 @@ internal static unsafe partial class Utils
         if (entry.PropertyType == PropertyType.公寓)
         {
             // Better logic for subdivision detection
-            if(!(entry.ApartmentSubdivision == ((h->IsInside() ? h->GetCurrentHouseId().Unit.ApartmentDivision : h->GetCurrentDivision() - 1) == 1))) return false;
+            if (!(entry.ApartmentSubdivision == ((h->IsInside() ? h->GetCurrentHouseId().Unit.ApartmentDivision : h->GetCurrentDivision() - 1) == 1))) return false;
             return entry.Apartment == h->GetCurrentRoom();
         }
         return false;
@@ -1254,10 +1253,10 @@ internal static unsafe partial class Utils
     public static bool IsAtAddress(this AddressBookEntry entry)
     {
         var h = HousingManager.Instance();
-        if(h == null) return false;
-        if(h->GetCurrentWard() != entry.Ward - 1) return false;
-        if(GetResidentialAetheryteByTerritoryType(P.Territory) != entry.City) return false;
-        if(entry.PropertyType is PropertyType.房屋)
+        if (h == null) return false;
+        if (h->GetCurrentWard() != entry.Ward - 1) return false;
+        if (GetResidentialAetheryteByTerritoryType(P.Territory) != entry.City) return false;
+        if (entry.PropertyType is PropertyType.房屋)
         {
             return h->GetCurrentPlot() == entry.Plot - 1;
         }
@@ -1271,8 +1270,8 @@ internal static unsafe partial class Utils
     // Can determine if it does the full IsHere logic or not with checkAddress.
     public static bool IsInsideApartment(this AddressBookEntry entry, bool checkAddress)
     {
-        if(entry.PropertyType == PropertyType.房屋) return false;
-        if(checkAddress && !IsAtAddress(entry)) return false;
+        if (entry.PropertyType == PropertyType.房屋) return false;
+        if (checkAddress && !IsAtAddress(entry)) return false;
         var h = HousingManager.Instance();
         return h != null && h->IsInside() && h->GetCurrentRoom() == entry.Apartment;
     }
@@ -1298,26 +1297,26 @@ internal static unsafe partial class Utils
             return;
         }
         // Check first if already at our destination.
-        if(IsAtAddress(entry))
+        if (IsAtAddress(entry))
         {
             // We dont need to do anything if at our house, but if at our address we do.
-            if(entry.PropertyType == PropertyType.房屋)
+            if (entry.PropertyType == PropertyType.房屋)
             {
                 return;
             }
-            else if(entry.PropertyType == PropertyType.公寓)
+            else if (entry.PropertyType == PropertyType.公寓)
             {
-                if(IsInsideApartment(entry, false))
+                if (IsInsideApartment(entry, false))
                 {
                     return;
                 }
                 // We were infront of the apartment, so attempt the automation from the door. If it fails, fallback
-                else if(TaskApproachAndInteractWithApartmentEntrance.TargetApartmentEntrance())
+                else if (TaskApproachAndInteractWithApartmentEntrance.TargetApartmentEntrance())
                 {
                     TaskApproachAndInteractWithApartmentEntrance.Enqueue(false);
                     P.TaskManager.Enqueue(TaskTpAndGoToWard.SelectGoToSpecifiedApartment);
                     P.TaskManager.Enqueue(() => TaskTpAndGoToWard.SelectApartment(entry.Apartment - 1), $"SelectApartment {entry.Apartment - 1}");
-                    if(!C.AddressApartmentNoEntry) P.TaskManager.Enqueue(TaskTpAndGoToWard.ConfirmApartmentEnterYesno);
+                    if (!C.AddressApartmentNoEntry) P.TaskManager.Enqueue(TaskTpAndGoToWard.ConfirmApartmentEnterYesno);
                     return;
                 }
             }

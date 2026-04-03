@@ -1253,10 +1253,11 @@ internal static unsafe partial class Utils
     public static bool IsAtAddress(this AddressBookEntry entry)
     {
         var h = HousingManager.Instance();
-        if (h == null) return false;
-        if (h->GetCurrentWard() != entry.Ward - 1) return false;
-        if (GetResidentialAetheryteByTerritoryType(P.Territory) != entry.City) return false;
-        if (entry.PropertyType is PropertyType.房屋)
+        if(h == null) return false;
+        if(entry.World != Player.Object.CurrentWorld.RowId) return false;
+        if(h->GetCurrentWard() != entry.Ward - 1) return false;
+        if(GetResidentialAetheryteByTerritoryType(P.Territory) != entry.City) return false;
+        if(entry.PropertyType is PropertyType.房屋)
         {
             return h->GetCurrentPlot() == entry.Plot - 1;
         }

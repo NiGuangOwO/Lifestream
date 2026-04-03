@@ -9,5 +9,5 @@
   "AcceptsFeedback": false,
   "IconUrl": "https://raw.githubusercontent.com/NightmareXIV/MyDalamudPlugins/main/icons/lifestream.png",
   "DalamudApiLevel": 14,
-  "ChangeLog": "修复跨服传送失效问题"
+  "ChangeLog": "修复房区快捷传送失效问题"
 }

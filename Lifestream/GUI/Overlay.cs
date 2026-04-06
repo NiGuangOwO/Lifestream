@@ -399,7 +399,7 @@ public class Overlay : Window
         }
         else if (canUse == AetheryteUseState.住宅 || canUse == AetheryteUseState.自定义)
         {
-            ret = C.ShowAethernet && (canUse != AetheryteUseState.Residential || C.ShowMiniAetheryteOverlay);
+            ret = C.ShowAethernet && (canUse != AetheryteUseState.住宅 || C.ShowMiniAetheryteOverlay);
         }
         if (canUse == AetheryteUseState.无)
         {

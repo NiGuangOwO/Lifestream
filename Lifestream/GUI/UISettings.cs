@@ -318,6 +318,7 @@ internal static unsafe class UISettings
                 ImGui.Checkbox($"显示城内以太水晶菜单", ref C.ShowAethernet);
                 ImGui.Checkbox($"显示服务器菜单", ref C.ShowWorldVisit);
                 ImGui.Checkbox($"显示房区按钮", ref C.ShowWards);
+                ImGui.Checkbox($"在微型以太水晶附近显示悬浮窗", ref C.ShowMiniAetheryteOverlay);
 
                 UtilsUI.NextSection();
 

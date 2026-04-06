@@ -48,11 +48,11 @@ public class Overlay : Window
 
     private float GetBasePosX()
     {
-        if (C.PosHorizontal == BasePositionHorizontal.÷–º‰)
+        if (C.PosHorizontal == BasePositionHorizontal.‰∏≠Èó¥)
         {
             return ImGuiHelpers.MainViewport.Size.X / 2 - WSize.X / 2;
         }
-        else if (C.PosHorizontal == BasePositionHorizontal.”“±ﬂ)
+        else if (C.PosHorizontal == BasePositionHorizontal.Âè≥Ëæπ)
         {
             return ImGuiHelpers.MainViewport.Size.X - WSize.X;
         }
@@ -64,11 +64,11 @@ public class Overlay : Window
 
     private float GetBasePosY()
     {
-        if (C.PosVertical == BasePositionVertical.÷–º‰)
+        if (C.PosVertical == BasePositionVertical.‰∏≠Èó¥)
         {
             return ImGuiHelpers.MainViewport.Size.Y / 2 - WSize.Y / 2;
         }
-        else if (C.PosVertical == BasePositionVertical.µ◊≤ø)
+        else if (C.PosVertical == BasePositionVertical.Â∫ïÈÉ®)
         {
             return ImGuiHelpers.MainViewport.Size.Y - WSize.Y;
         }
@@ -86,7 +86,7 @@ public class Overlay : Window
         List<Action> actions = [];
         if (S.Data.ResidentialAethernet.IsInResidentialZone())
         {
-            if (C.ShowAethernet)
+            if (C.ShowAethernet && C.ShowMiniAetheryteOverlay)
             {
                 actions.Add(() => DrawResidentialAethernet(false));
                 actions.Add(() => DrawResidentialAethernet(true));
@@ -204,7 +204,7 @@ public class Overlay : Window
 
         if (P.ActiveAetheryte.Value.ID == 70 && C.Firmament)
         {
-            var name = "ÃÏÒ∑Ω÷";
+            var name = "Â§©Á©πË°ó";
             ResizeButton($"{Pad}{name}");
             if (ImGui.Button($"{Pad}{name}", ButtonSizeAetheryte))
             {
@@ -276,7 +276,7 @@ public class Overlay : Window
         {
             for (var i = 1; i <= Math.Min(maxInstances, 9); i++)
             {
-                var name = $"∏±±æ«¯ {TaskChangeInstance.InstanceNumbers[i]}";
+                var name = $"ÂâØÊú¨Âå∫ {TaskChangeInstance.InstanceNumbers[i]}";
                 ResizeButton(name);
                 var d = S.InstanceHandler.GetInstance() == i;
                 if (ImGuiEx.Button($"{Pad}{name}", ButtonSizeInstance, !d))
@@ -289,11 +289,11 @@ public class Overlay : Window
         else
         {
             ImGuiEx.Text($"""
-                ∏±±æ«¯ø…”√£¨
-                µ´Œ¥≥ı ºªØ°£
+                ÂâØÊú¨Âå∫ÂèØÁî®Ôºå
+                ‰ΩÜÊú™ÂàùÂßãÂåñ„ÄÇ
 
-                “™≥ı ºªØ∏±±æ«¯£¨
-                Ωªª•“‘Ã´÷Æπ‚“ª¥Œ°£
+                Ë¶ÅÂàùÂßãÂåñÂâØÊú¨Âå∫Ôºå
+                ‰∫§‰∫í‰ª•Â§™‰πãÂÖâ‰∏ÄÊ¨°„ÄÇ
                 """);
         }
     }
@@ -306,16 +306,16 @@ public class Overlay : Window
         }
         if (ImGui.BeginPopup($"LifestreamPopup{x.ID}"))
         {
-            if (ImGuiEx.CollectionCheckbox("œ≤∞Æ", x.ID, C.Favorites))
+            if (ImGuiEx.CollectionCheckbox("ÂñúÁà±", x.ID, C.Favorites))
             {
                 PluginLog.Debug($"Rebuilding data store");
                 S.Data.DataStore = new();
                 EzConfig.Save();
             }
-            if (ImGuiEx.CollectionCheckbox("“˛≤ÿ", x.ID, C.Hidden))
+            if (ImGuiEx.CollectionCheckbox("ÈöêËóè", x.ID, C.Hidden))
                 EzConfig.Save();
             var newName = C.Renames.TryGetValue(x.ID, out var value) ? value : "";
-            ImGuiEx.Text($"÷ÿ√¸√˚:");
+            ImGuiEx.Text($"ÈáçÂëΩÂêç:");
             ImGui.SetNextItemWidth(200f.Scale());
             if (ImGui.InputText($"##LifestreamRename", ref newName, 100))
             {
@@ -385,8 +385,8 @@ public class Overlay : Window
         if (!C.Enable)
             return false;
         var canUse = Utils.CanUseAetheryte();
-        var ret = canUse != AetheryteUseState.Œﬁ;
-        if (canUse == AetheryteUseState.∆’Õ®)
+        var ret = canUse != AetheryteUseState.Êó†;
+        if (canUse == AetheryteUseState.ÊôÆÈÄö)
         {
             if (P.ActiveAetheryte.Value.IsWorldChangeAetheryte())
             {
@@ -397,11 +397,11 @@ public class Overlay : Window
                 ret = C.ShowAethernet;
             }
         }
-        else if (canUse == AetheryteUseState.◊°’¨ || canUse == AetheryteUseState.◊‘∂®“Â)
+        else if (canUse == AetheryteUseState.‰ΩèÂÆÖ || canUse == AetheryteUseState.Ëá™ÂÆö‰πâ)
         {
-            ret = C.ShowAethernet;
+            ret = C.ShowAethernet && (canUse != AetheryteUseState.Residential || C.ShowMiniAetheryteOverlay);
         }
-        if (canUse == AetheryteUseState.Œﬁ)
+        if (canUse == AetheryteUseState.Êó†)
         {
             bWidth = new(10, 10);
         }

@@ -1,4 +1,4 @@
-﻿using ECommons.Configuration;
+using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.Reflection;
 using ECommons.SplatoonAPI;
@@ -312,6 +312,7 @@ public static unsafe class UIHouseReg
                         IsPrivate = isPrivate
                     };
                     C.HousePathDatas.Add(newData);
+                    EzConfig.Save();
                 }
             }
             else
@@ -325,6 +326,7 @@ public static unsafe class UIHouseReg
             if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Trash, "取消注册", ImGuiEx.Ctrl))
             {
                 C.HousePathDatas.Remove(data);
+                EzConfig.Save();
             }
             ImGuiEx.Tooltip("按住 CTRL 并单击");
             ImGui.Checkbox("传送后的行为", ref data.EnableHouseEnterModeOverride);
@@ -393,11 +395,13 @@ public static unsafe class UIHouseReg
         if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "添加到列表末尾"))
         {
             path.Add(Player.Position);
+            EzConfig.Save();
         }
         ImGui.SameLine();
         if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Plus, "添加到列表的开头"))
         {
             path.Insert(0, Player.Position);
+            EzConfig.Save();
         }
         if (data != null)
         {

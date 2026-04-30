@@ -8,6 +8,5 @@
   "RepoUrl": "https://github.com/NightmareXIV/Lifestream",
   "AcceptsFeedback": false,
   "IconUrl": "https://raw.githubusercontent.com/NightmareXIV/MyDalamudPlugins/main/icons/lifestream.png",
-  "DalamudApiLevel": 14,
-  "ChangeLog": "修复房区快捷传送失效问题"
+  "DalamudApiLevel": 15
 }

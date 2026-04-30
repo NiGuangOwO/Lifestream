@@ -18,8 +18,8 @@ public class SelectWorldWindow : Window
             ImGuiEx.Text($"没有可前往的目的地");
             return;
         }
-        var datacenters = worlds.Select(x => x?.DataCenter).DistinctBy(x => x?.RowId).OrderBy(x => x.Value.ValueNullable?.Region).ToArray();
-        if (ImGui.BeginTable("LifestreamSelectWorld", datacenters.Length, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.BordersV | ImGuiTableFlags.BordersOuter))
+        var datacenters = worlds.Select(x => x?.DataCenter).DistinctBy(x => x?.RowId).OrderBy(x => x.Value.ValueNullable?.Region.RowId).ToArray();
+        if(ImGui.BeginTable("LifestreamSelectWorld", datacenters.Length, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.BordersV | ImGuiTableFlags.BordersOuter))
         {
             foreach (var dc in datacenters)
             {

@@ -87,14 +87,14 @@ internal static unsafe class WorldChange
     {
         if(!Player.Available) return false;
         var worlds = Utils.GetAvailableWorldDestinations();
-        var index = Array.IndexOf(worlds, world);
+        var index = Array.IndexOf([..worlds], world);
         if(index != -1)
         {
             if(TryGetAddonByName<AtkUnitBase>("WorldTravelSelect", out var addon) && IsAddonReady(addon))
             {
                 if(EzThrottler.Throttle("SelectWorldToVisit", 1000))
                 {
-                    Callback.Fire(addon, true, index + 2);
+                    Callback.Fire(addon, true, 0, index + 2);
                     return true;
                 }
             }
@@ -211,7 +211,7 @@ internal static unsafe class WorldChange
     internal static bool? WaitUntilNotBusy()
     {
         if(!Player.Available) return false;
-        return S.Data.DataStore.Territories.Contains(P.Territory) && Player.Object.CastActionId == 0 && !IsOccupied() && !Utils.IsDisallowedToUseAethernet() && Player.Object.IsTargetable;
+        return S.Data.DataStore.Territories.Contains(P.Territory) && Player.Object.CastInfo.ActionId == 0 && !IsOccupied() && !Utils.IsDisallowedToUseAethernet() && Player.Object.IsTargetable;
     }
 
 

@@ -403,6 +403,7 @@ internal static unsafe partial class Utils
 
     public static bool ApproachConditionIsMet()
     {
+        P.UpdateAetherytes();
         return (P.ActiveAetheryte == null || !P.ActiveAetheryte.Value.IsAetheryte) && Utils.GetReachableAetheryte(x => x.IsAetheryte()) != null;
     }
 
@@ -498,7 +499,7 @@ internal static unsafe partial class Utils
         return P.Territory.EqualsAny(Houses.Private_Chambers_Empyreum, Houses.Private_Chambers_Mist, Houses.Private_Chambers_Shirogane, Houses.Private_Chambers_The_Goblet, Houses.Private_Chambers_The_Lavender_Beds);
     }
 
-    public static bool IsTerritoryResidentialDistrict(ushort obj)
+    public static bool IsTerritoryResidentialDistrict(uint obj)
     {
         return obj.EqualsAny(ResidentalAreas.Mist, ResidentalAreas.Shirogane, ResidentalAreas.Empyreum, ResidentalAreas.The_Goblet, ResidentalAreas.The_Lavender_Beds);
     }
@@ -1650,14 +1651,11 @@ internal static unsafe partial class Utils
 
     internal static AetheryteUseState CanUseAetheryte()
     {
-        if (P.TaskManager.IsBusy || IsOccupied() || IsDisallowedToUseAethernet())
-            return AetheryteUseState.无;
-        if (S.Data.DataStore.Territories.Contains(P.Territory) && P.ActiveAetheryte != null)
-            return AetheryteUseState.普通;
-        if (S.Data.ResidentialAethernet.IsInResidentialZone() && S.Data.ResidentialAethernet.ActiveAetheryte != null)
-            return AetheryteUseState.住宅;
-        if (S.Data.CustomAethernet.ZoneInfo.ContainsKey(P.Territory) && S.Data.CustomAethernet.ActiveAetheryte != null)
-            return AetheryteUseState.自定义;
+        if(P.TaskManager.IsBusy || IsOccupied() || IsDisallowedToUseAethernet()) return AetheryteUseState.无;
+        P.UpdateAetherytes();
+        if(S.Data.DataStore.Territories.Contains(P.Territory) && P.ActiveAetheryte != null) return AetheryteUseState.普通;
+        if(S.Data.ResidentialAethernet.IsInResidentialZone() && S.Data.ResidentialAethernet.ActiveAetheryte != null) return AetheryteUseState.住宅;
+        if(S.Data.CustomAethernet.ZoneInfo.ContainsKey(P.Territory) && S.Data.CustomAethernet.ActiveAetheryte != null) return AetheryteUseState.自定义;
         return AetheryteUseState.无;
     }
 
@@ -1843,22 +1841,24 @@ internal static unsafe partial class Utils
         return null;
     }
 
-    internal static string[] GetAvailableWorldDestinations()
+    internal static List<string> GetAvailableWorldDestinations()
     {
-        if (TryGetAddonByName<AtkUnitBase>("WorldTravelSelect", out var addon) && IsAddonReady(addon))
+        var ret = new List<string>();
+        var stringArray = RaptureAtkModule.Instance()->AtkArrayDataHolder.StringArrays[(int)StringArrayType.WorldTranslate];
+        if(stringArray != null)
         {
-            List<string> arr = [];
-            for (var i = 3; i <= 9; i++)
+            for(var i = 3; i <= 10; i++)
             {
-                var item = addon->UldManager.NodeList[4]->GetAsAtkComponentNode()->Component->UldManager.NodeList[i];
-                var text = GenericHelpers.ReadSeString(&item->GetAsAtkComponentNode()->Component->UldManager.NodeList[4]->GetAsAtkTextNode()->NodeText).GetText();
-                if (text == "")
-                    break;
-                arr.Add(text);
+                var str = stringArray->StringArray[i];
+                if(str.HasValue)
+                {
+                    var worldName = MemoryHelper.ReadStringNullTerminated((nint)str.Value).Trim();
+                    if(worldName.IsNullOrEmpty()) break;
+                    ret.Add(worldName);
+                }
             }
-            return [.. arr];
         }
-        return Array.Empty<string>();
+        return ret;
     }
 
     internal static string[] GetAvailableAethernetDestinations()

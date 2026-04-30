@@ -10,6 +10,8 @@ using Lifestream.Tasks.SameWorld;
 using Lifestream.Tasks.Shortcuts;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
+using TerraFX.Interop.WinRT;
+
 
 namespace Lifestream.IPC;
 
@@ -404,6 +406,12 @@ public class IPCProvider
     }
 
     [EzIPC]
+    public void MoveEx(List<Vector3> path, bool? ignoreDeltaY, float? destTolerance, float? tolerance)
+    {
+        P.FollowPath.Move(path, ignoreDeltaY ?? true, destTolerance ?? 0, tolerance ?? 0.25f);
+    }
+
+    [EzIPC]
     public bool CanMoveToWorkshop()
     {
         var data = Utils.GetFCPathData();
@@ -531,6 +539,44 @@ public class IPCProvider
             return ErrorCode.Player_is_not_logged_in;
         TaskLogout.Enqueue();
         return ErrorCode.Success;
+    }
+
+    [EzIPC]
+    public List<AddressBookEntryTuple> GetAddressBookEntries()
+    {
+        var ret = new List<AddressBookEntryTuple>();
+        foreach(var x in C.AddressBookFolders)
+        {
+            foreach(var e in x.Entries)
+            {
+                ret.Add(e.AsTuple());
+            }
+        }
+        return ret;
+    }
+
+    [EzIPC]
+    public Dictionary<string, List<AddressBookEntryTuple>> GetAddressBookEntriesWithFolders()
+    {
+        var ret = new Dictionary<string, List<AddressBookEntryTuple>>();
+        foreach(var x in C.AddressBookFolders)
+        {
+            string key = "";
+            if(S.AddressBookFileSystemManager.FileSystem.FindLeaf(x, out var leaf))
+            {
+                key = leaf.FullName();
+            }
+            if(!ret.TryGetValue(key, out var value))
+            {
+                value = [];
+                ret[key] = value;
+            }
+            foreach(var e in x.Entries)
+            {
+                value.Add(e.AsTuple());
+            }
+        }
+        return ret;
     }
 
     [EzIPCEvent] public System.Action OnHouseEnterError;

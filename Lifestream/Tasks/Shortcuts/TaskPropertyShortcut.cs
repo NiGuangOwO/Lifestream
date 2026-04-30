@@ -264,8 +264,8 @@ public static unsafe class TaskPropertyShortcut
             }
             PluginLog.Debug($"Inn territory: {ExcelTerritoryHelper.GetName(id)}");
             var data = InnData[id];
-            var aetheryte = Svc.Data.GetExcelSheet<Aetheryte>().First(x => x.IsAetheryte && x.Territory.RowId == id);
-            if ((P.ActiveAetheryte == null || P.ActiveAetheryte.Value.ID != aetheryte.RowId) && (Utils.GetReachableMasterAetheryte() == null || id != P.Territory))
+            var aetheryte = Svc.Data.GetExcelSheet<Aetheryte>().First(x => x.IsAetheryte && x.Territory.RowId == id); P.UpdateAetherytes();
+            if((P.ActiveAetheryte == null || P.ActiveAetheryte.Value.ID != aetheryte.RowId) && (Utils.GetReachableMasterAetheryte() == null || id != P.Territory))
             {
                 P.TaskManager.Enqueue(() => WorldChange.ExecuteTPToAethernetDestination(aetheryte.RowId, 0), $"Teleport to aetheryte {aetheryte.PlaceName.ValueNullable?.Name}");
                 P.TaskManager.Enqueue(() => !IsScreenReady(), "Wait for Screen Not Ready");
@@ -451,7 +451,8 @@ public static unsafe class TaskPropertyShortcut
 
     private static uint GetInnTerritoryId()
     {
-        if (C.PreferredInn != 0)
+        P.UpdateAetherytes();
+        if(C.PreferredInn != 0)
         {
             var aetheryte = Svc.Data.GetExcelSheet<Aetheryte>().FirstOrNull(x => x.IsAetheryte && x.Territory.RowId == C.PreferredInn);
             if (aetheryte != null && Svc.AetheryteList.Any(a => a.AetheryteId == aetheryte?.RowId))

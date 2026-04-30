@@ -113,9 +113,9 @@ public class DataStore
 
     internal void BuildWorlds(uint dc)
     {
-        Worlds = [.. Svc.Data.GetExcelSheet<World>().Where(x => x.DataCenter.Value.RowId == dc && (x.IsPublic() || x.RowId > 1000)).Select(x => x.Name.ToString()).Order()];
+        Worlds = [.. Svc.Data.GetExcelSheet<World>().Where(x => x.DataCenter.Value.RowId == dc && x.IsPublic()).Select(x => x.Name.ToString()).Order()];
         PluginLog.Debug($"Built worlds: {Worlds.Print()}");
-        DCWorlds = Svc.Data.GetExcelSheet<World>().Where(x => x.DataCenter.Value.RowId != dc && (x.IsPublic() || x.RowId > 1000) && (x.DataCenter.Value.Region.RowId == Player.Object.HomeWorld.Value.DataCenter.Value.Region.RowId || x.DataCenter.Value.Region.RowId == 4)).Select(x => x.Name.ToString()).ToArray();
+        DCWorlds = Svc.Data.GetExcelSheet<World>().Where(x => x.DataCenter.Value.RowId != dc && x.IsPublic() && (x.DataCenter.Value.Region.RowId == Player.Object.HomeWorld.Value.DataCenter.Value.Region.RowId)).Select(x => x.Name.ToString()).ToArray();
         PluginLog.Debug($"Built DCworlds: {DCWorlds.Print()}");
     }
 

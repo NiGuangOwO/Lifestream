@@ -419,7 +419,7 @@ internal static unsafe partial class Utils
         return Svc.PluginInterface.InstalledPlugins.Any(x => x.InternalName == "Dalamud.FindAnything" && x.IsLoaded);
     }
 
-    public static string ParseSheetPattern(string s)
+    public static string ParseSheetPattern(string s, bool onlyFirst)
     {
         try
         {
@@ -433,7 +433,7 @@ internal static unsafe partial class Utils
                     var result = Svc.Data.GetType().GetMethod("GetExcelSheet", ReflectionHelper.AllFlags).MakeGenericMethod([type]).Invoke(Svc.Data, [null, null]).Call("GetRow", [rowId]).GetFoP(col);
                     if (result is ReadOnlySeString ross)
                     {
-                        return ross.GetText();
+                        return ross.GetText(onlyFirst);
                     }
                     return result.ToString();
                 }
@@ -448,7 +448,7 @@ internal static unsafe partial class Utils
                     var result = sheet.Call("GetRow", [rowId]).GetFoP(col);
                     if (result is ReadOnlySeString ross)
                     {
-                        return ross.GetText();
+                        return ross.GetText(onlyFirst);
                     }
                     return result.ToString();
                 }

@@ -52,6 +52,7 @@ public unsafe class Memory : IDisposable
     internal void ConstructEvent(AtkUnitBase* addon, int category, int which, int nodeIndex, int itemToSelect, int itemToHighlight)
     {
         if(itemToSelect == 0) throw new Exception("Enumeration starts with 1");
+        PluginLog.Information($"Called ConstructEvent with category={category}, which={which}, nodeIndex={nodeIndex}, itemToSelect={itemToSelect}, itemToHighlight={itemToHighlight}");
         var Event = stackalloc AtkEvent[1]
         {
             new AtkEvent()
@@ -87,12 +88,12 @@ public unsafe class Memory : IDisposable
             new InputData()
             {
                 unk_8 = ptr,
-                unk_16 = itemToSelect,
+                unk_16 = itemToHighlight,
                 unk_24 = 0,
             }
         };
         AddonDKTWorldList_ReceiveEventDetour((nint)addon, 35, which, Event, Data);
-        //AtkComponentTreeList_vf31Detour((nint)addon->UldManager.NodeList[nodeIndex]->GetAsAtkComponentList(), (uint)itemToHighlight, 0);
+        AtkComponentTreeList_vf31Detour((nint)addon->UldManager.NodeList[nodeIndex]->GetAsAtkComponentList(), (uint)itemToHighlight, 0);
     }
 
     internal Memory()

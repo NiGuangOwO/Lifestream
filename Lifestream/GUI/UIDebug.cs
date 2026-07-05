@@ -486,8 +486,8 @@ internal static unsafe class UIDebug
                 e.Log();
             }
         }
-        ImGui.Text(Utils.ParseSheetPattern("<Addon:10:Text>"));
-        ImGui.Text(Utils.ParseSheetPattern("<Addon:10:RowId>"));
+        ImGui.Text(Utils.ParseSheetPattern("<Addon:10:Text>", false));
+        ImGui.Text(Utils.ParseSheetPattern("<Addon:10:RowId>", false));
         if(ImGui.CollapsingHeader("DawnStory"))
         {
             if(TryGetAddonMaster<AddonMaster.DawnStory>(out var m) && m.IsAddonReady)

@@ -48,6 +48,7 @@ public unsafe class CustomAliasCommand
     public float? InteractDistance = null;
     public int Timeout = 5000;
     public bool RequireUiOpen = false;
+    public bool ExcelOnlyFirst = false;
 
     public bool ShouldSerializeInteractDistance() => Kind.EqualsAny(CustomAliasKind.Interact) && InteractDistance != Default.InteractDistance;
     public bool ShouldSerializeWalkToExit() => Kind.EqualsAny(CustomAliasKind.Circular_movement) && WalkToExit != Default.WalkToExit;
@@ -200,7 +201,7 @@ public unsafe class CustomAliasCommand
                 if(TryGetAddonMaster<AddonMaster.SelectYesno>(out var m) && m.IsAddonReady)
                 {
                     //PluginLog.Debug($"Parsed text: [{m.Text}], options: {SelectOption.Where(x => x.Length > 0).Select(Utils.ParseSheetPattern).Print("\n")}");
-                    if(m.Text.ContainsAny(SelectOption.Where(x => x.Length > 0).Select(Utils.ParseSheetPattern)) && EzThrottler.Throttle($"CustomCommandSelectYesno_{ID}", 200))
+                    if(m.Text.ContainsAny(SelectOption.Where(x => x.Length > 0).Select(x => Utils.ParseSheetPattern(x, ExcelOnlyFirst))) && EzThrottler.Throttle($"CustomCommandSelectYesno_{ID}", 200))
                     {
                         m.Yes();
                         return true;
@@ -222,7 +223,7 @@ public unsafe class CustomAliasCommand
                     {
                         if(m.IsAddonReady)
                         {
-                            if(Utils.TryFindEqualsOrContains(m.Entries, e => e.Text, SelectOption.Where(x => x.Length > 0).Select(Utils.ParseSheetPattern), out var e))
+                            if(Utils.TryFindEqualsOrContains(m.Entries, e => e.Text, SelectOption.Where(x => x.Length > 0).Select(x => Utils.ParseSheetPattern(x, ExcelOnlyFirst)), out var e))
                             {
                                 visible = true;
                                 if(EzThrottler.Throttle($"CustomCommandSelectString_{ID}", 200))
@@ -240,7 +241,7 @@ public unsafe class CustomAliasCommand
                     {
                         if(m.IsAddonReady)
                         {
-                            if(Utils.TryFindEqualsOrContains(m.Entries, e => e.Text, SelectOption.Where(x => x.Length > 0).Select(Utils.ParseSheetPattern), out var e))
+                            if(Utils.TryFindEqualsOrContains(m.Entries, e => e.Text, SelectOption.Where(x => x.Length > 0).Select(x => Utils.ParseSheetPattern(x, ExcelOnlyFirst)), out var e))
                             {
                                 visible = true;
                                 if(EzThrottler.Throttle($"CustomCommandSelectString_{ID}", 200))

@@ -234,7 +234,7 @@ internal static unsafe class UISettings
         .Checkbox("从角色选择菜单启用数据中心和服务器访问", () => ref C.AllowDCTravelFromCharaSelect)
         .Checkbox("使用跨服而不是跨大区，即可在访问其他大区前往同一服务器。", () => ref C.UseGuestWorldTravel)
 
-        .Section("Wotsit Integration")
+        .Section("Wotsit 集成")
         .Widget(() =>
         {
             var anyChanged = ImGui.Checkbox("启用 Wotsit 集成以传送至以太网目的地", ref C.WotsitIntegrationEnabled);

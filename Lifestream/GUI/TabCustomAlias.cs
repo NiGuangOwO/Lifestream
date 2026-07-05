@@ -456,7 +456,7 @@ public static class TabCustomAlias
             {
                 ref var filter = ref Ref<string>.Get($"Filter{command.ID}");
                 ImGui.SetNextItemWidth(200f);
-                ImGui.InputTextWithHint("##filter", "Filter", ref filter, 50);
+                ImGui.InputTextWithHint("##filter", "筛选", ref filter, 50);
                 foreach (var x in Utils.KnownAetherytesByCategories)
                 {
                     bool shouldHide(ref string filter, KeyValuePair<uint, string> v) => filter.Length > 0 && !v.Value.Contains(filter, StringComparison.OrdinalIgnoreCase) && !x.Key.Contains(filter, StringComparison.OrdinalIgnoreCase);
@@ -609,7 +609,7 @@ public static class TabCustomAlias
                     command.SelectOption.Add("");
                 }
             }
-            ImGuiEx.Checkbox("Excel text comparison option: only first", ref command.ExcelOnlyFirst);
+            ImGuiEx.Checkbox("Excel文本比较选项：仅第一个", ref command.ExcelOnlyFirst);
         }
 
         if(command.Kind.Equals(CustomAliasKind.Close_UI))

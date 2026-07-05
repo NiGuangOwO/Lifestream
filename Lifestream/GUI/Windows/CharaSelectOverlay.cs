@@ -36,13 +36,13 @@ public unsafe class CharaSelectOverlay : EzOverlayWindow
         var homeWorldData = ExcelWorldHelper.Get(CharaWorld);
         if(homeWorldData == null)
         {
-            ImGuiEx.Text($"Error: for world {homeWorldData} no data found");
+            ImGuiEx.Text($"错误：未找到服务器 {CharaWorld} 的数据");
             return;
         }
         var worlds = Utils.GetVisitableWorldsFrom(homeWorldData.Value).OrderBy(x => x.Name.ToString()).ToArray();
         if(worlds.Length == 0)
         {
-            ImGuiEx.Text($"No available destinations");
+            ImGuiEx.Text($"没有可用的目的地");
             return;
         }
         if(TryGetValidCharaSelectListMenu(out var m))
@@ -50,12 +50,12 @@ public unsafe class CharaSelectOverlay : EzOverlayWindow
             var chara = m.Characters.FirstOrDefault(x => x.Name == CharaName && x.HomeWorld == CharaWorld);
             if(chara == null)
             {
-                ImGuiEx.Text($"Character not found: {CharaName}@{ExcelWorldHelper.GetName(CharaWorld)}");
+                ImGuiEx.Text($"未找到角色：{CharaName}@{ExcelWorldHelper.GetName(CharaWorld)}");
                 return;
             }
             ImGuiEx.LineCentered(() =>
             {
-                ImGui.Checkbox("Do not log in after transfer", ref NoLogin);
+                ImGui.Checkbox("传送后不要登录", ref NoLogin);
             });
             var datacenters = worlds.Select(x => x.DataCenter).DistinctBy(x => x.RowId).OrderBy(x => x.Value.Region.RowId).ToArray();
             if(ImGui.BeginTable("LifestreamSelectWorld", datacenters.Length, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.BordersV | ImGuiTableFlags.BordersOuter | ImGuiTableFlags.NoSavedSettings))
@@ -107,7 +107,7 @@ public unsafe class CharaSelectOverlay : EzOverlayWindow
         }
         else
         {
-            ImGuiEx.Text("Unable to display world selection.");
+            ImGuiEx.Text("无法显示服务器选择。");
         }
     }
 

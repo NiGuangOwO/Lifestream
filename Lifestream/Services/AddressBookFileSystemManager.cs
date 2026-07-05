@@ -28,7 +28,7 @@ public class AddressBookFileSystemManager
         if(item.Entries == null)
         {
             item = null;
-            Notify.Error($"Item contains invalid data");
+            Notify.Error($"项目包含无效数据");
         }
         item.IsDefault = false;
         item.GUID = Guid.NewGuid();
@@ -69,11 +69,11 @@ public class AddressBookFileSystemManager
                 }
                 if(entry == null)
                 {
-                    Notify.Error("Could not move");
+                    Notify.Error("无法移动");
                 }
                 else if(folder == leaf.Value)
                 {
-                    Notify.Error($"Could not move to the same folder");
+                    Notify.Error($"无法移动到同一个文件夹");
                 }
                 else
                 {

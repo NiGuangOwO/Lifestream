@@ -99,7 +99,7 @@ internal static class TaskTryTpToAethernetDestination
                         {
                             if(!Utils.EnqueueTeleport(targetName, null))
                             {
-                                DuoLog.Error("Destination could not be found (2)");
+                                DuoLog.Error("未找到目的地 (2)");
                                 return null;
                             }
                             return true;
@@ -107,7 +107,7 @@ internal static class TaskTryTpToAethernetDestination
                     }
                     else
                     {
-                        DuoLog.Error("Destination could not be found (3)");
+                        DuoLog.Error("未找到目的地 (3)");
                         return null;
                     }
                 }
@@ -125,7 +125,7 @@ internal static class TaskTryTpToAethernetDestination
                 {
                     if(a.Name.Contains(targetName, StringComparison.OrdinalIgnoreCase))
                     {
-                        ChatPrinter.Green($"[Lifestream] Destination: {ExcelTerritoryHelper.GetName(x.Key.TerritoryType)} - {a.Name}");
+                        ChatPrinter.Green($"[Lifestream] 目的地：{ExcelTerritoryHelper.GetName(x.Key.TerritoryType)} - {a.Name}");
                         P.TaskManager.BeginStack();
                         try
                         {
@@ -203,13 +203,13 @@ internal static class TaskTryTpToAethernetDestination
                 {
                     if(!Utils.EnqueueTeleport(targetName, null))
                     {
-                        DuoLog.Error("Destination could not be found");
+                        DuoLog.Error("未找到目的地");
                     }
                 });
                 return;
             }
 
-            Notify.Error($"No destination {targetName} found");
+            Notify.Error($"未找到目的地 {targetName}");
             return;
         }
     }

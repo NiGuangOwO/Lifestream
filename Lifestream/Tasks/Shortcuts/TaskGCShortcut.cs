@@ -68,12 +68,12 @@ public static unsafe class TaskGCShortcut
     {
         if(P.TaskManager.IsBusy)
         {
-            DuoLog.Error($"Lifestream is busy, could not process request");
+            DuoLog.Error($"Lifestream 正忙，无法处理请求");
             return;
         }
         if(!Player.Available)
         {
-            DuoLog.Error("Player not available");
+            DuoLog.Error("玩家不可用");
             return;
         }
         companyNullable ??= fcgc ? (GrandCompany)InfoProxyFreeCompany.Instance()->GrandCompany : Player.GrandCompany;
@@ -81,22 +81,22 @@ public static unsafe class TaskGCShortcut
         {
             if(Svc.AetheryteList.Any(x => x.AetheryteId == (int)WorldChangeAetheryte.Uldah))
             {
-                DuoLog.Warning($"Grand company not specified and player is unemployed. Teleporting to Immortal Flames.");
+                DuoLog.Warning($"未指定军团且玩家未加入军团。正在传送到恒辉队。");
                 companyNullable = GrandCompany.ImmortalFlames;
             }
             else if(Svc.AetheryteList.Any(x => x.AetheryteId == (int)WorldChangeAetheryte.Gridania))
             {
-                DuoLog.Warning($"Grand company not specified and player is unemployed. Teleporting to Twin Adder.");
+                DuoLog.Warning($"未指定军团且玩家未加入军团。正在传送到双蛇党。");
                 companyNullable = GrandCompany.TwinAdder;
             }
             else if(Svc.AetheryteList.Any(x => x.AetheryteId == (int)WorldChangeAetheryte.Limsa))
             {
-                DuoLog.Warning($"Grand company not specified and player is unemployed. Teleporting to Maelstrom.");
+                DuoLog.Warning($"未指定军团且玩家未加入军团。正在传送到黑涡团。");
                 companyNullable = GrandCompany.Maelstrom;
             }
             else
             {
-                DuoLog.Error("Grand company not specified, player is unemployed and can not teleport to any destination.");
+                DuoLog.Error("未指定军团，玩家未加入军团，无法传送到任何目的地。");
                 return;
             }
         }

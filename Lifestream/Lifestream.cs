@@ -165,7 +165,7 @@ public unsafe class Lifestream : IDalamudPlugin
             }
             else
             {
-                DuoLog.Error($"Could not recognize world {spl[1]}");
+                DuoLog.Error($"无法识别服务器 {spl[1]}");
             }
         }
         else if (arguments.StartsWith("debug TaskAetheryteAethernetTeleport "))
@@ -177,7 +177,7 @@ public unsafe class Lifestream : IDalamudPlugin
             }
             if (args.Length != 4 || !uint.TryParse(args[2], out var a) || !uint.TryParse(args[3], out var b))
             {
-                DuoLog.Error("Invalid arguments");
+                DuoLog.Error("参数无效");
                 return;
             }
 
@@ -215,7 +215,7 @@ public unsafe class Lifestream : IDalamudPlugin
         {
             if (S.InstanceHandler.GetInstance() == val)
             {
-                DuoLog.Warning($"Already in instance {val}");
+                DuoLog.Warning($"已在副本 {val}");
             }
             else if (S.InstanceHandler.CanChangeInstance())
             {
@@ -223,7 +223,7 @@ public unsafe class Lifestream : IDalamudPlugin
             }
             else
             {
-                DuoLog.Error($"Can't change instance now");
+                DuoLog.Error($"现在无法切换副本");
             }
         }
         else if (arguments.EqualsIgnoreCaseAny("open", "select", "window", "w", "world", "travel"))
@@ -261,7 +261,7 @@ public unsafe class Lifestream : IDalamudPlugin
             if (innNum != null && !innNum.Value.InRange(0, TaskPropertyShortcut.InnData.Count))
             {
                 var num = 1;
-                DuoLog.Warning($"Invalid inn index. Valid inns are: \n{TaskPropertyShortcut.InnData.Select(s => $"{num++} - {Utils.GetInnNameFromTerritory(s.Key)}").Print("\n")}");
+                DuoLog.Warning($"旅馆编号无效。有效的旅馆：\n{TaskPropertyShortcut.InnData.Select(s => $"{num++} - {Utils.GetInnNameFromTerritory(s.Key)}").Print("\n")}");
             }
             else
             {
@@ -298,7 +298,7 @@ public unsafe class Lifestream : IDalamudPlugin
                 }
                 else
                 {
-                    DuoLog.Error($"Could not parse input: {arglist[1]}");
+                    DuoLog.Error($"无法解析输入: {arglist[1]}");
                 }
             }
         }
@@ -320,7 +320,7 @@ public unsafe class Lifestream : IDalamudPlugin
                 if (S.Data.DataStore.IslandNPCs.TryGetFirst(x => x.Value.Any(y => y.Contains(name, StringComparison.OrdinalIgnoreCase)), out var npc))
                     TaskISShortcut.Enqueue(npc.Key);
                 else
-                    DuoLog.Error($"Could not parse input: {name}");
+                    DuoLog.Error($"无法解析输入: {name}");
             }
         }
         else if (arguments.EqualsIgnoreCaseAny("cosmic", "ardorum", "moon"))
@@ -336,7 +336,7 @@ public unsafe class Lifestream : IDalamudPlugin
             }
             else
             {
-                Notify.Error("Lifestream is busy");
+                Notify.Error("Lifestream 很忙");
             }
         }
         else if (arguments.EqualsIgnoreCase("occult"))
@@ -347,7 +347,7 @@ public unsafe class Lifestream : IDalamudPlugin
             }
             else
             {
-                Notify.Error("Lifestream is busy");
+                Notify.Error("Lifestream 很忙");
             }
         }
         else if (arguments.EqualsIgnoreCase("Firmament"))
@@ -358,7 +358,7 @@ public unsafe class Lifestream : IDalamudPlugin
             }
             else
             {
-                Notify.Error("Lifestream is busy");
+                Notify.Error("Lifestream 很忙");
             }
         }
         else if (arguments.StartsWithAny(StringComparison.OrdinalIgnoreCase, "tp"))
@@ -366,7 +366,7 @@ public unsafe class Lifestream : IDalamudPlugin
             var destination = primary[(primary.IndexOf("tp") + 2)..].Trim();
             if (destination == null || destination == "")
             {
-                DuoLog.Error($"Please type something");
+                DuoLog.Error($"请输入内容");
             }
             else
             {
@@ -433,7 +433,7 @@ public unsafe class Lifestream : IDalamudPlugin
                 }
                 else if (Utils.TryGetWorldFromDataCenter(primary, out var world, out var dc))
                 {
-                    Utils.DisplayInfo($"Random world from {Svc.Data.GetExcelSheet<WorldDCGroupType>().GetRow(dc).Name}: {world}");
+                    Utils.DisplayInfo($"来自 {Svc.Data.GetExcelSheet<WorldDCGroupType>().GetRow(dc).Name} 的随机服务器: {world}");
                     TPAndChangeWorld(world, Player.Object.CurrentWorld.ValueNullable?.DataCenter.RowId != dc, gateway: gateway);
                 }
                 else
@@ -465,23 +465,23 @@ public unsafe class Lifestream : IDalamudPlugin
             {
                 if (isDcTransfer && !C.AllowDcTransfer)
                 {
-                    Notify.Error($"Data center transfers are not enabled in the configuration.");
+                    Notify.Error($"配置中未启用跨大区传送。");
                     return;
                 }
                 if (TaskManager.IsBusy)
                 {
-                    Notify.Error("Another task is in progress");
+                    Notify.Error("另一个任务正在进行中");
                     return;
                 }
             }
             if (!Player.Available)
             {
-                Notify.Error("No player");
+                Notify.Error("未找到玩家");
                 return;
             }
             if (destinationWorld == Player.CurrentWorld)
             {
-                Notify.Error("Already in this world");
+                Notify.Error("已在该服务器");
                 return;
             }
             /*if(ActionManager.Instance()->GetActionStatus(ActionType.Spell, 5) != 0)
@@ -491,9 +491,9 @@ public unsafe class Lifestream : IDalamudPlugin
             }*/
             if (Svc.Party.Length > 1 && !C.LeavePartyBeforeWorldChange && !C.LeavePartyBeforeWorldChange)
             {
-                Notify.Warning("You must disband party in order to switch worlds");
+                Notify.Warning("切换服务器前必须解散队伍");
             }
-            Utils.DisplayInfo($"Destination: {destinationWorld}");
+            Utils.DisplayInfo($"目的地：{destinationWorld}");
             if (isDcTransfer)
             {
                 var type = DCVType.Unknown;
@@ -551,7 +551,7 @@ public unsafe class Lifestream : IDalamudPlugin
                 }
                 else
                 {
-                    DuoLog.Error($"Error - unknown data center visit type");
+                    DuoLog.Error($"错误 - 未知的跨大区访问类型");
                 }
                 PluginLog.Information($"Data center visit: {type}");
             }
@@ -564,7 +564,7 @@ public unsafe class Lifestream : IDalamudPlugin
                 }*/
                 TaskTPAndChangeWorld.Enqueue(destinationWorld, gateway.Value.AdjustGateway(), false);
                 if (doNotify == true)
-                    TaskDesktopNotification.Enqueue($"Arrived to {destinationWorld}");
+                    TaskDesktopNotification.Enqueue($"已到达 {destinationWorld}");
                 CharaSelectVisit.EnqueueSecondary(noSecondaryTeleport, secondaryTeleport);
             }
         }
@@ -624,7 +624,7 @@ public unsafe class Lifestream : IDalamudPlugin
                 {
                     if (EzThrottler.Throttle("WarnTerminate", 1000))
                     {
-                        DuoLog.Warning($"Arrived to {ExcelWorldHelper.GetName(TabUtility.TargetWorldID)}. Game is shutting down in {EzThrottler.GetRemainingTime("TerminateGame") / 1000} seconds. Type \"/li stop\" to cancel.");
+                        DuoLog.Warning($"已到达 {ExcelWorldHelper.GetName(TabUtility.TargetWorldID)}。游戏将在 {EzThrottler.GetRemainingTime("TerminateGame") / 1000} 秒后关闭。输入 \"/li stop\" 取消。");
                     }
                 }
             }

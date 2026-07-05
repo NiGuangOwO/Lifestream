@@ -15,7 +15,7 @@ public static class TerritoryWatcher
             ClientState_TerritoryChanged(Svc.ClientState.TerritoryType);
             if(Utils.IsInsideHouse() || Utils.IsInsideWorkshop() || Utils.IsInsidePrivateChambers())
             {
-                DuoLog.Warning($"Lifestream was loaded or updated while being inside house. Please re-enter house to ensure data reliability.");
+                DuoLog.Warning($"Lifestream 在房屋内部被加载或更新。请重新进入房屋以确保数据可靠性。");
             }
         }
         Purgatory.Add(() =>

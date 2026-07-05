@@ -19,7 +19,7 @@ public static class TaskGeneratePath
                 {
                     if(!task.IsCompletedSuccessfully)
                     {
-                        DuoLog.Error($"-- Pathfind failed");
+                        DuoLog.Error($"-- 寻路失败");
                         return null;
                     }
                     else
@@ -46,7 +46,7 @@ public static class TaskGeneratePath
                 {
                     if(!task.IsCompletedSuccessfully)
                     {
-                        DuoLog.Error($"-- Pathfind failed");
+                        DuoLog.Error($"-- 寻路失败");
                         return null;
                     }
                     else
@@ -55,7 +55,7 @@ public static class TaskGeneratePath
                         var distanceOld = Utils.CalculatePathDistance([.. info.Path]);
                         if(distanceNew < distanceOld)
                         {
-                            DuoLog.Warning($"-- For plot {plotNum + 1}, old distance was {distanceOld} > {distanceNew} new distance, replacing path and aetheryte from {Svc.Data.GetExcelSheet<HousingAethernet>().GetRowOrDefault(info.AethernetID)?.PlaceName.ValueNullable?.Name}, please double-check path.");
+                            DuoLog.Warning($"-- 对地块 {plotNum + 1}，旧距离 {distanceOld} > 新距离 {distanceNew}，正在替换路径和以太水晶 ({Svc.Data.GetExcelSheet<HousingAethernet>().GetRowOrDefault(info.AethernetID)?.PlaceName.ValueNullable?.Name})，请仔细检查路径。");
                             info.Path = [.. task.Result];
                             info.AethernetID = aetheryte.ID;
                             Utils.SaveGeneratedHousingData();

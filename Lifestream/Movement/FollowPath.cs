@@ -65,13 +65,13 @@ public class FollowPath : IDisposable
             if(S.Ipc.VnavmeshIPC.IsRunning())
             {
                 WaypointsInternal.Clear();
-                DuoLog.Error($"Detected vnavmesh movement, Lifestream will abort all tasks now.");
+                DuoLog.Error($"检测到 vnavmesh 移动，Lifestream 将立即中止所有任务。");
                 break;
             }
             if(EzThrottler.Check(FollowPathTime))
             {
                 WaypointsInternal.Clear();
-                DuoLog.Error($"Lifestream movement has timed out.");
+                DuoLog.Error($"Lifestream 移动已超时。");
                 break;
             }
 

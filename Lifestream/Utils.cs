@@ -254,7 +254,7 @@ internal static unsafe partial class Utils
             {
                 if (S.TeleportService.TeleportToAetheryte(x.AetheryteId, wait: !additionalCommand.IsNullOrEmpty()))
                 {
-                    ChatPrinter.Green($"[Lifestream] Destination (Aethernet): {x.AetheryteData
+                    ChatPrinter.Green($"[Lifestream] 目的地（以太水晶）: {x.AetheryteData
                         .Value.AethernetName.ValueNullable?.Name} at {ExcelTerritoryHelper.GetName(x.AetheryteData.Value.Territory.RowId)}");
                     return true;
                 }
@@ -266,7 +266,7 @@ internal static unsafe partial class Utils
             {
                 if (S.TeleportService.TeleportToAetheryte(x.AetheryteId, wait: !additionalCommand.IsNullOrEmpty()))
                 {
-                    ChatPrinter.Green($"[Lifestream] Destination (Place): {x.AetheryteData
+                    ChatPrinter.Green($"[Lifestream] 目的地（地点）: {x.AetheryteData
                         .Value.PlaceName.ValueNullable?.Name} at {ExcelTerritoryHelper.GetName(x.AetheryteData.Value.Territory.RowId)}");
                     return true;
                 }
@@ -278,7 +278,7 @@ internal static unsafe partial class Utils
             {
                 if (S.TeleportService.TeleportToAetheryte(x.AetheryteId, wait: !additionalCommand.IsNullOrEmpty()))
                 {
-                    ChatPrinter.Green($"[Lifestream] Destination (Zone): {x.AetheryteData
+                    ChatPrinter.Green($"[Lifestream] 目的地（区域）: {x.AetheryteData
                         .Value.Territory.Value.PlaceName.Value.Name} at {ExcelTerritoryHelper.GetName(x.AetheryteData.Value.Territory.RowId)}");
                     return true;
                 }
@@ -800,21 +800,21 @@ internal static unsafe partial class Utils
                     }
                     else
                     {
-                        Notify.Error("Element is not selected");
+                        Notify.Error("未选择元素");
                     }
                 }
                 else
                 {
-                    Notify.Error("Splatoon is not installed");
+                    Notify.Error("Splatoon 未安装");
                 }
             }
             catch (Exception e)
             {
                 e.Log();
-                Notify.Error("An error occurred while retrieving element coordinates");
+                Notify.Error("获取元素坐标时发生错误");
             }
         }
-        ImGuiEx.Tooltip("From selected Splatoon element");
+        ImGuiEx.Tooltip("从选中的 Splatoon 元素获取");
     }
 
     public static void DrawVector3Selector(string id, ref Vector3 value)
@@ -863,21 +863,21 @@ internal static unsafe partial class Utils
                     }
                     else
                     {
-                        Notify.Error("Element is not selected");
+                        Notify.Error("未选择元素");
                     }
                 }
                 else
                 {
-                    Notify.Error("Splatoon is not installed");
+                    Notify.Error("Splatoon 未安装");
                 }
             }
             catch (Exception e)
             {
                 e.Log();
-                Notify.Error("An error occurred while retrieving element coordinates");
+                Notify.Error("获取元素坐标时发生错误");
             }
         }
-        ImGuiEx.Tooltip("From selected Splatoon element");
+        ImGuiEx.Tooltip("从选中的 Splatoon 元素获取");
     }
 
     public static IEnumerable<uint> GetAllRegisteredAethernetDestinations()
@@ -900,7 +900,7 @@ internal static unsafe partial class Utils
             {
                 if (Svc.AetheryteList.Any(x => x.AetheryteId == (int)c))
                 {
-                    DuoLog.Warning($"{gateway} is not unlocked, but {c} is, adjusting.");
+                    DuoLog.Warning($"{gateway} 未解锁，但 {c} 已解锁，正在调整。");
                     gateway = c;
                     break;
                 }
@@ -1301,12 +1301,12 @@ internal static unsafe partial class Utils
     {
         if (!Player.Available)
         {
-            Notify.Error($"Can not travel while character is not available");
+            Notify.Error($"角色不可用时无法传送");
             return;
         }
         if (!S.Data.DataStore.DCWorlds.Contains(ExcelWorldHelper.GetName(entry.World)) && !S.Data.DataStore.Worlds.Contains(ExcelWorldHelper.GetName(entry.World)))
         {
-            Notify.Error($"Can not travel to {ExcelWorldHelper.GetName(entry.World)}");
+            Notify.Error($"无法传送到 {ExcelWorldHelper.GetName(entry.World)}");
             return;
         }
         // Check first if already at our destination.

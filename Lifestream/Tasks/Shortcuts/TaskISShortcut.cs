@@ -44,12 +44,12 @@ public static unsafe class TaskISShortcut
     {
         if(P.TaskManager.IsBusy)
         {
-            DuoLog.Error($"Lifestream is busy, could not process request");
+            DuoLog.Error($"Lifestream 正忙，无法处理请求");
             return;
         }
         if(!Player.Available)
         {
-            DuoLog.Error("Player not available");
+            DuoLog.Error("玩家不可用");
             return;
         }
         if(returnHome)

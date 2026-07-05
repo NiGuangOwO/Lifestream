@@ -84,17 +84,17 @@ public class PaissaImporter
     {
         if (book.Entries.Count == 0)
         {
-            ImGuiEx.Text("No houses are currently available for bidding!");
+            ImGuiEx.Text("当前没有可竞价的房屋！");
         }
         else if (ImGui.BeginTable($"##addressbook", 7, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
         {
-            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("Size");
-            ImGui.TableSetupColumn("Bids");
-            ImGui.TableSetupColumn("Allowed Tenants");
-            ImGui.TableSetupColumn("World");
-            ImGui.TableSetupColumn("Ward");
-            ImGui.TableSetupColumn("Plot");
+            ImGui.TableSetupColumn("名称", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("大小");
+            ImGui.TableSetupColumn("出价");
+            ImGui.TableSetupColumn("允许租客");
+            ImGui.TableSetupColumn("服务器");
+            ImGui.TableSetupColumn("区");
+            ImGui.TableSetupColumn("号");
             List<(Vector2 RowPos, Action AcceptDraw)> MoveCommands = [];
             ImGui.TableHeadersRow();
 

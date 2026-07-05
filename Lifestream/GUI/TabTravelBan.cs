@@ -46,7 +46,7 @@ public static class TabTravelBan
                 ImGui.TableNextColumn();
                 ImGuiEx.InputWithRightButtonsArea(() =>
                 {
-                    ImGui.InputTextWithHint("##chara", "Character name", ref entry.CharaName, 30);
+                    ImGui.InputTextWithHint("##chara", "角色名称", ref entry.CharaName, 30);
                 }, () =>
                 {
                     ImGuiEx.Text("@");

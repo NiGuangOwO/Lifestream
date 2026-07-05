@@ -78,10 +78,10 @@ public unsafe class SearchHelperOverlay : Window
 
         var additionalDescriptions = new Dictionary<string, string>
         {
-            ["help"] = "Show command help",
-            ["?"] = "Show command help",
-            ["commands"] = "Show command help",
-            ["stop"] = "Stop all tasks"
+            ["help"] = "显示命令帮助",
+            ["?"] = "显示命令帮助",
+            ["commands"] = "显示命令帮助",
+            ["stop"] = "停止所有任务"
         };
 
         foreach(var kvp in additionalDescriptions)
@@ -111,8 +111,8 @@ public unsafe class SearchHelperOverlay : Window
         {
             var description = CommandDescriptions.TryGetValue(cmd, out var desc)
                 ? desc
-                : "Built-in command";
-            AddUniqueSuggestion(cmd, "Built-in", description);
+                : "内置命令";
+            AddUniqueSuggestion(cmd, "内置", description);
         }
 
         var specialCommands = new[] { "help", "?", "commands", "stop" };
@@ -120,7 +120,7 @@ public unsafe class SearchHelperOverlay : Window
         {
             if(CommandDescriptions.TryGetValue(cmd, out var desc))
             {
-                AddUniqueSuggestion(cmd, "System", desc);
+                AddUniqueSuggestion(cmd, "系统", desc);
             }
         }
 
@@ -128,16 +128,16 @@ public unsafe class SearchHelperOverlay : Window
         {
             var stepCount = alias.Commands?.Count ?? 0;
             var desc = stepCount > 0
-                ? $"Custom sequence with {stepCount} step{(stepCount != 1 ? "s" : "")}"
-                : "Custom alias";
-            AddUniqueSuggestion(alias.Alias, "Custom Alias", desc);
+                ? $"自定义序列，共{stepCount}步"
+                : "自定义别名";
+            AddUniqueSuggestion(alias.Alias, "自定义别名", desc);
         }
 
         foreach(var folder in C.AddressBookFolders)
         {
             foreach(var entry in folder.Entries.Where(x => x.AliasEnabled && !string.IsNullOrEmpty(x.Alias)))
             {
-                AddUniqueSuggestion(entry.Alias, "Address Book", entry.GetAddressString());
+                AddUniqueSuggestion(entry.Alias, "地址簿", entry.GetAddressString());
             }
         }
 
@@ -145,7 +145,7 @@ public unsafe class SearchHelperOverlay : Window
         {
             foreach(var world in S.Data.DataStore.Worlds)
             {
-                AddUniqueSuggestion(world, "World", $"Travel to {world}");
+                AddUniqueSuggestion(world, "服务器", $"传送到 {world}");
             }
         }
 
@@ -153,7 +153,7 @@ public unsafe class SearchHelperOverlay : Window
         {
             foreach(var world in S.Data.DataStore.DCWorlds)
             {
-                AddUniqueSuggestion(world, "DC World", $"Travel to {world} (cross-DC)");
+                AddUniqueSuggestion(world, "跨大区服务器", $"传送到 {world}（跨大区）");
             }
         }
     }
@@ -224,13 +224,13 @@ public unsafe class SearchHelperOverlay : Window
         if(FilteredSuggestions.Count == 0)
         {
             ImGui.PushStyleColor(ImGuiCol.Text, 0xFF808080);
-            ImGui.Text("No matching commands found");
+            ImGui.Text("未找到匹配的命令");
             ImGui.PopStyleColor();
             return;
         }
 
         ImGui.PushStyleColor(ImGuiCol.Text, 0xFFFFFFFF);
-        ImGui.Text($"Lifestream Commands{(string.IsNullOrEmpty(FilterText) ? "" : $" matching '{FilterText}'")}:");
+        ImGui.Text($"Lifestream 命令{(string.IsNullOrEmpty(FilterText) ? "" : $" 匹配 '{FilterText}'")}：");
         ImGui.PopStyleColor();
         ImGui.Separator();
 
@@ -275,12 +275,12 @@ public unsafe class SearchHelperOverlay : Window
 
             var typeColor = suggestion.Type switch
             {
-                "Built-in" => 0xFF4080FF,
-                "System" => 0xFF8040FF,
-                "Custom Alias" => 0xFFFF6000,
-                "Address Book" => 0xFFFF0080,
-                "World" => 0xFFFFD000,
-                "DC World" => 0xFFFF4080,
+                "内置" => 0xFF4080FF,
+                "系统" => 0xFF8040FF,
+                "自定义别名" => 0xFFFF6000,
+                "地址簿" => 0xFFFF0080,
+                "服务器" => 0xFFFFD000,
+                "跨大区服务器" => 0xFFFF4080,
                 _ => 0xFF808080
             };
 
@@ -291,7 +291,7 @@ public unsafe class SearchHelperOverlay : Window
 
         ImGui.Separator();
         ImGui.PushStyleColor(ImGuiCol.Text, 0xFF808080);
-        ImGui.Text("Click or Ctrl+1-9 to complete");
+        ImGui.Text("点击或 Ctrl+1-9 来完成");
         ImGui.PopStyleColor();
         WindowSize = ImGui.GetWindowSize();
     }

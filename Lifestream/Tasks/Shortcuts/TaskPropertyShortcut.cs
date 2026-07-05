@@ -40,7 +40,7 @@ public static unsafe class TaskPropertyShortcut
     {
         if (P.TaskManager.IsBusy)
         {
-            DuoLog.Error($"Lifestream is busy");
+            DuoLog.Error($"Lifestream 正忙");
             return;
         }
         if (!Player.Available)
@@ -74,7 +74,7 @@ public static unsafe class TaskPropertyShortcut
                 }
                 else
                 {
-                    DuoLog.Error("Could not find private house");
+                    DuoLog.Error("未找到个人房屋");
                 }
             }
             else if (propertyType == PropertyType.部队房屋)
@@ -85,7 +85,7 @@ public static unsafe class TaskPropertyShortcut
                 }
                 else
                 {
-                    DuoLog.Error("Could not find free company house");
+                    DuoLog.Error("未找到部队房屋");
                 }
             }
             else if (propertyType == PropertyType.共享房屋)
@@ -98,7 +98,7 @@ public static unsafe class TaskPropertyShortcut
                 }
                 else
                 {
-                    DuoLog.Error("Could not find shared estate");
+                    DuoLog.Error("未找到共享房屋");
                 }
             }
             else if (propertyType == PropertyType.公寓)
@@ -109,7 +109,7 @@ public static unsafe class TaskPropertyShortcut
                 }
                 else
                 {
-                    DuoLog.Error("Could not find apartment");
+                    DuoLog.Error("未找到公寓");
                 }
             }
             else if (propertyType == PropertyType.旅馆)
@@ -251,7 +251,7 @@ public static unsafe class TaskPropertyShortcut
             {
                 if (!Utils.IsInnUnlocked())
                 {
-                    DuoLog.Error($"Inn is not unlocked");
+                    DuoLog.Error($"旅馆未解锁");
                     return null;
                 }
                 return true;
@@ -259,7 +259,7 @@ public static unsafe class TaskPropertyShortcut
             var id = innIndex == null ? GetInnTerritoryId() : InnData.Keys.ElementAt(innIndex.Value);
             if (id == 0)
             {
-                DuoLog.Error($"No suitable inn found");
+                DuoLog.Error($"未找到合适的旅馆");
                 return;
             }
             PluginLog.Debug($"Inn territory: {ExcelTerritoryHelper.GetName(id)}");

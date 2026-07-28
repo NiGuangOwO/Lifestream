@@ -35,6 +35,7 @@ public static class WotsitEntryGenerator
         91,  // Prologue Gate (Western Hinterlands)
         92,  // Epilogue Gate (Eastern Hinterlands)
         120, // The Ruby Price
+        239, // Phantom Village
     ];
 
     // These values cannot be read sometimes during a territory change, so we

@@ -17,11 +17,11 @@ public class CustomAlias : IFileSystemStorage
     public string GetCustomName() => null;
     public void SetCustomName(string s) { }
 
-    public void Enqueue(bool force = false, int? inclusiveStart = null, int? exclusiveEnd = null)
+    public void Enqueue(bool force = false, int? inclusiveStart = null, int? exclusiveEnd = null, bool bypassCheck = false)
     {
         foreach(var x in Commands)
         {
-            if(!x.CanExecute(out var e))
+            if(!bypassCheck && !x.CanExecute(out var e))
             {
                 DuoLog.Error($"{e}");
                 return;

@@ -21,7 +21,7 @@ public static unsafe class CharaSelectVisit
             if(ExcelWorldHelper.Get(homeWorld)?.Name != destinationWorld)
             {
                 P.TaskManager.EnqueueMulti([
-                    new(WorldChange.WaitUntilNotBusy, TaskSettings.TimeoutInfinite),
+                    new(DCChange.WaitUntilNotBusy, TaskSettings.TimeoutInfinite),
                         new DelayTask(1000),
                         new(() => TaskTPAndChangeWorld.Enqueue(destinationWorld, gateway.Value.AdjustGateway(), true), $"TpAndChangeWorld {destinationWorld} at {gateway.Value}"),
                         ]);
@@ -46,7 +46,7 @@ public static unsafe class CharaSelectVisit
             if(ExcelWorldHelper.Get(homeWorld)?.Name != destinationWorld)
             {
                 P.TaskManager.EnqueueMulti([
-                    new(WorldChange.WaitUntilNotBusy, TaskSettings.TimeoutInfinite),
+                    new(DCChange.WaitUntilNotBusy, TaskSettings.TimeoutInfinite),
                         new DelayTask(1000),
                         new(() => TaskTPAndChangeWorld.Enqueue(destinationWorld, gateway.Value.AdjustGateway(), true), $"TpAndChangeWorld {destinationWorld} at {gateway.Value}"),
                         ]);

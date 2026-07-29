@@ -151,12 +151,13 @@ public unsafe class Lifestream : IDalamudPlugin
         if (arguments.Contains('@'))
         {
             var spl = arguments.Split('@');
-            var world = ExcelWorldHelper.GetPublicWorlds().FirstOrNull(x => x.Name.ToString().EqualsIgnoreCase(spl[1]));
-            if (world != null)
+            var spl2 = spl[1].Split(' ');
+            var world = ExcelWorldHelper.GetPublicWorlds().FirstOrNull(x => x.Name.ToString().EqualsIgnoreCase(spl2[0]));
+            if(world != null)
             {
                 if (!Utils.IsBusy())
                 {
-                    Utils.ChangeCharacter(spl[0], world.Value.Name.ToString());
+                    Utils.ChangeCharacter(spl[0], world.Value.Name.ToString(), spl2.Length > 1? spl2[1]:null);
                 }
                 else
                 {

@@ -6,6 +6,8 @@ using ECommons.Throttlers;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lifestream.GUI.Windows;
+using Lifestream.IPC;
 using Lumina.Excel.Sheets;
 
 namespace Lifestream.Tasks.Login;
@@ -20,6 +22,15 @@ public static unsafe class TaskChangeCharacter
         EnqueueLogin(currentLoginWorld, charaName, charaWorld, account);
     }
 
+    public static void Enqueue(string currentLoginWorld, string charaName, string charaWorld, int account, string destinationWorld)
+    {
+        if(Svc.ClientState.IsLoggedIn)
+        {
+            EnqueueLogout();
+        }
+        EnqueueLogin(currentLoginWorld, charaName, charaWorld, account, destinationWorld);
+    }
+
     public static void EnqueueLogout()
     {
         P.TaskManager.Enqueue(Logout);
@@ -32,6 +43,21 @@ public static unsafe class TaskChangeCharacter
         ConnectToDc(currentLoginWorld, account);
         P.TaskManager.Enqueue(TaskChangeCharacter.ResetWorldIndex);
         P.TaskManager.Enqueue(() => SelectCharacter(charaName, homeWorld, currentLoginWorld), $"Select chara {charaName}@{homeWorld}", new(timeLimitMS: 1000000));
+        P.TaskManager.Enqueue(ConfirmLogin);
+    }
+
+    public static void EnqueueLogin(string currentLoginWorld, string charaName, string homeWorld, int account, string? destination)
+    {
+        PluginLog.Debug($"TaskChangeCharacter - EnqueueLogin enqueued");
+        ConnectToDc(currentLoginWorld, account);
+        P.TaskManager.Enqueue(TaskChangeCharacter.ResetWorldIndex);
+        P.TaskManager.Enqueue(() =>
+        {
+            P.TaskManager.InsertStack(() =>
+            {
+                IpcUtils.InitiateTravelFromCharaSelectScreenInternal(charaName, homeWorld, destination, false);
+            });
+        }, $"Select chara {charaName}@{homeWorld} => {destination}", new(timeLimitMS: 1000000));
         P.TaskManager.Enqueue(ConfirmLogin);
     }
 

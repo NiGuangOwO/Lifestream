@@ -8,6 +8,8 @@ using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.Sheets;
 using ECommons.ExcelServices.TerritoryEnumeration;
+using ECommons.EzIpcManager;
+using ECommons.GameHelpers;
 using ECommons.Interop;
 using ECommons.MathHelpers;
 using ECommons.Reflection;
@@ -54,7 +56,7 @@ internal static unsafe partial class Utils
         return false;
     }
 
-    public static ErrorCode ChangeCharacter(string charaName, string charaHomeWorld)
+    public static ErrorCode ChangeCharacter(string charaName, string charaHomeWorld, string? destinationWorld = null)
     {
         if (!ExcelWorldHelper.GetPublicWorlds().Any(x => x.Name == charaHomeWorld))
         {
@@ -70,13 +72,13 @@ internal static unsafe partial class Utils
                     TaskConnectAndOpenCharaSelect.Enqueue(charaName, charaHomeWorld);
                 });
             }, "Use TaskConnectAndOpenCharaSelect");
-            P.TaskManager.Enqueue(() => IpcUtils.InitiateTravelFromCharaSelectScreenInternal(charaName, charaHomeWorld, null, false), "Use InitiateTravelFromCharaSelectScreenInternal");
+            P.TaskManager.Enqueue(() => IpcUtils.InitiateTravelFromCharaSelectScreenInternal(charaName, charaHomeWorld, destinationWorld, false), "Use InitiateTravelFromCharaSelectScreenInternal");
             return ErrorCode.Success;
         }
         if (CanAutoLogin())
         {
             TaskConnectAndOpenCharaSelect.Enqueue(charaName, charaHomeWorld);
-            P.TaskManager.Enqueue(() => IpcUtils.InitiateTravelFromCharaSelectScreenInternal(charaName, charaHomeWorld, null, false));
+            P.TaskManager.Enqueue(() => IpcUtils.InitiateTravelFromCharaSelectScreenInternal(charaName, charaHomeWorld, destinationWorld, false));
             return ErrorCode.Success;
         }
         return ErrorCode.Player_is_not_logged_in;

@@ -144,6 +144,8 @@ public unsafe class CharaSelectOverlay : EzOverlayWindow
     {
         var charaCurrentWorld = ExcelWorldHelper.Get(currentWorld);
         var charaHomeWorld = ExcelWorldHelper.Get(homeWorld);
+        if(targetWorld.HasValue && targetWorld.Value.RowId == currentWorld) targetWorld = null;
+
         if(targetWorld.HasValue)
         {
             try

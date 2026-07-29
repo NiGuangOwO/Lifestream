@@ -79,7 +79,7 @@ internal static class Lang
         internal const string HighQuality = "";
     }
 
-    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗？", "登入嗎？", "접속하시겠습니까?", "登錄嗎", "登录吗"];
+    internal static readonly string[] LogInPartialText = ["Logging in with", "Log in with", "でログインします。", "einloggen?", "eingeloggt.", "Se connecter avec", "Vous allez vous connecter avec", "Souhaitez-vous vous connecter avec", "登入吗？", "登入嗎？", "접속하시겠습니까?", "登錄嗎", "登录吗", "三可以通过次级指令重新编辑角色形象", "登录游戏吗"]; 
 
     /*
     1	TEXT_AETHERYTE_TOWN_WARP<Gui(69)/> Aethernet.

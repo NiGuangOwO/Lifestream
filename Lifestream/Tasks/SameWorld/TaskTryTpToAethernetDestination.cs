@@ -32,7 +32,7 @@ internal static class TaskTryTpToAethernetDestination
             PluginLog.Debug($"Can run: true by residential");
             return true;
         }
-        if(P.ActiveAetheryte == null && Utils.GetReachableWorldChangeAetheryte() != null && ShouldApproachAetheryte(targetName))
+        if(P.ActiveAetheryte == null && Utils.GetReachableMasterAetheryte() != null && ShouldApproachAetheryte(targetName))
         {
             PluginLog.Debug($"Can run: true by approachable");
             return true;
@@ -75,11 +75,11 @@ internal static class TaskTryTpToAethernetDestination
             P.TaskManager.Enqueue(() =>
             {
                 P.UpdateAetherytes();
-                if(P.ActiveAetheryte == null && Utils.GetReachableWorldChangeAetheryte() != null && ShouldApproachAetheryte(targetName))
+                if(P.ActiveAetheryte == null && Utils.GetReachableMasterAetheryte() != null && ShouldApproachAetheryte(targetName))
                 {
                     P.TaskManager.InsertMulti([
                             new FrameDelayTask(10),
-                        new(WorldChange.TargetReachableWorldChangeAetheryte),
+                        new(WorldChange.TargetReachableMasterAetheryte),
                         new(WorldChange.LockOn),
                         new(WorldChange.EnableAutomove),
                         new(WorldChange.WaitUntilMasterAetheryteExists),
@@ -216,7 +216,7 @@ internal static class TaskTryTpToAethernetDestination
 
     static bool ShouldApproachAetheryte(string targetName)
     {
-        var near = Utils.GetTinyAetheryteFromGameObject(Utils.GetReachableWorldChangeAetheryte());
+        var near = Utils.GetTinyAetheryteFromGameObject(Utils.GetReachableMasterAetheryte());
         if(near != null)
         {
             var master = Utils.GetMaster(near.Value);

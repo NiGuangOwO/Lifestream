@@ -512,14 +512,14 @@ public class IPCProvider
     [EzIPC]
     public void EnqueueCustomAlias(CustomAlias alias, bool force, int? inclusiveStart, int? inclusiveEnd)
     {
-        alias.Enqueue(force, inclusiveStart, inclusiveEnd);
+        alias.Enqueue(force, inclusiveStart, inclusiveEnd, true);
     }
 
     [EzIPC]
     public void EnqueueCustomAliasFromString(string aliasString, bool force, int? inclusiveStart, int? inclusiveEnd)
     {
         var alias = JsonConvert.DeserializeObject<CustomAlias>(aliasString) ?? throw new NullReferenceException();
-        alias.Enqueue(force, inclusiveStart, inclusiveEnd);
+        alias.Enqueue(force, inclusiveStart, inclusiveEnd, true);
     }
 
     [EzIPC]
@@ -528,6 +528,13 @@ public class IPCProvider
         if (Utils.IsBusy())
             return ErrorCode.Plugin_is_busy;
         return Utils.ChangeCharacter(name, world);
+    }
+
+    [EzIPC]
+    public ErrorCode ChangeCharacterAndTravel(string name, string world, string destinationWorld)
+    {
+        if(Utils.IsBusy()) return ErrorCode.Plugin_is_busy;
+        return Utils.ChangeCharacter(name, world, destinationWorld);
     }
 
     [EzIPC]

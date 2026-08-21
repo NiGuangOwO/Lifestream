@@ -98,8 +98,8 @@ public static class WotsitEntryGenerator
         {
             yield return new WotsitEntry
             {
-                DisplayName = "Open world select window",
-                SearchString = "open world select window - open travel window",
+                DisplayName = "打开服务器选择窗口",
+                SearchString = "open world select window - open travel window - 打开服务器选择窗口 - 打开跨服窗口",
                 IconId = 55,
                 Callback = () => S.Gui.SelectWorldWindow.IsOpen = true,
             };
@@ -108,8 +108,8 @@ public static class WotsitEntryGenerator
         {
             yield return new WotsitEntry
             {
-                DisplayName = "Auto-teleport to property",
-                SearchString = "auto-teleport to property",
+                DisplayName = "自动传送到房屋",
+                SearchString = "auto-teleport to property - 自动传送到房屋",
                 IconId = 52,
                 Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.自动),
             };
@@ -118,8 +118,8 @@ public static class WotsitEntryGenerator
         {
             yield return new WotsitEntry
             {
-                DisplayName = "Teleport to your private estate",
-                SearchString = "teleport to your private estate - teleport to home",
+                DisplayName = "传送到你的个人房屋",
+                SearchString = "teleport to your private estate - teleport to home - 传送到个人房屋 - 回家",
                 IconId = 52,
                 Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.个人房屋),
             };
@@ -128,8 +128,8 @@ public static class WotsitEntryGenerator
         {
             yield return new WotsitEntry
             {
-                DisplayName = "Teleport to your free company estate",
-                SearchString = "teleport to your free company estate - teleport to fc",
+                DisplayName = "传送到你的部队房屋",
+                SearchString = "teleport to your free company estate - teleport to fc - 传送到部队房屋",
                 IconId = 52,
                 Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.部队房屋),
             };
@@ -138,8 +138,8 @@ public static class WotsitEntryGenerator
         {
             yield return new WotsitEntry
             {
-                DisplayName = "Teleport to your apartment",
-                SearchString = "teleport to your apartment",
+                DisplayName = "传送到你的公寓",
+                SearchString = "teleport to your apartment - 传送到公寓",
                 IconId = 52,
                 Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.公寓),
             };
@@ -149,8 +149,8 @@ public static class WotsitEntryGenerator
             // TODO: each inn could be a separate entry in the future
             yield return new WotsitEntry
             {
-                DisplayName = "Teleport to an inn room",
-                SearchString = "teleport to an inn room",
+                DisplayName = "传送到旅店房间",
+                SearchString = "teleport to an inn room - 传送到旅店房间 - 旅馆",
                 IconId = 88,
                 Callback = () => TaskPropertyShortcut.Enqueue(TaskPropertyShortcut.PropertyType.旅馆),
             };
@@ -160,15 +160,15 @@ public static class WotsitEntryGenerator
         {
             var (name, icon) = Player.GrandCompany switch
             {
-                GrandCompany.Maelstrom => ("Maelstrom", 60313u),
-                GrandCompany.TwinAdder => ("Twin Adder", 60306u),
-                GrandCompany.ImmortalFlames => ("Immortal Flames", 60305u),
+                GrandCompany.Maelstrom => ("黑涡团", 60313u),
+                GrandCompany.TwinAdder => ("双蛇党", 60306u),
+                GrandCompany.ImmortalFlames => ("恒辉队", 60305u),
                 _ => throw new NotImplementedException(),
             };
             yield return new WotsitEntry
             {
-                DisplayName = "Teleport to your grand company - " + name,
-                SearchString = name + " - teleport to your grand company headquarters - teleport to gc hq",
+                DisplayName = "传送到你的大国防联军 - " + name,
+                SearchString = name + " - teleport to your grand company headquarters - teleport to gc hq - 传送到大国防联军 - 部队箱",
                 IconId = icon,
                 Callback = () => TaskGCShortcut.Enqueue(Player.GrandCompany),
             };
@@ -177,8 +177,8 @@ public static class WotsitEntryGenerator
         {
             yield return new WotsitEntry
             {
-                DisplayName = "Teleport to a market board",
-                SearchString = "teleport to a market board - teleport to mb",
+                DisplayName = "传送到市场布告板",
+                SearchString = "teleport to a market board - teleport to mb - 传送到市场布告板 - 板子",
                 IconId = 63,
                 Callback = () => TaskMBShortcut.Enqueue(),
             };
@@ -188,8 +188,8 @@ public static class WotsitEntryGenerator
         {
             yield return new WotsitEntry
             {
-                DisplayName = "Teleport to your island sanctuary",
-                SearchString = "teleport to your island sanctuary - teleport to is",
+                DisplayName = "传送到你的无人岛",
+                SearchString = "teleport to your island sanctuary - teleport to is - 传送到无人岛",
                 IconId = 23,
                 Callback = () => TaskISShortcut.Enqueue(),
             };
@@ -251,7 +251,7 @@ public static class WotsitEntryGenerator
             var searchStr = entry.Name + (!string.IsNullOrEmpty(entry.Alias) && entry.Alias != entry.Name ? " - " + entry.Alias : "");
             yield return new WotsitEntry
             {
-                DisplayName = $"Teleport to address {entry.Name}",
+                DisplayName = $"传送到地址 {entry.Name}",
                 SearchString = searchStr,
                 IconId = 52,
                 Callback = entry.GoTo,

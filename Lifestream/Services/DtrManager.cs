@@ -38,7 +38,7 @@ public class DtrManager : IDisposable
             if(str != null)
             {
                 Entry.Text = str;
-                Entry.Tooltip = $"You are in instance {obj}";
+                Entry.Tooltip = $"你正在副本 {obj}";
                 Entry.Shown = true;
             }
         }

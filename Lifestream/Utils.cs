@@ -765,27 +765,27 @@ internal static unsafe partial class Utils
         {
             value = Player.Position.ToVector2();
         }
-        ImGuiEx.Tooltip("To player positon");
+        ImGuiEx.Tooltip("获取玩家位置");
         ImGui.SameLine(0, 1);
         if (ImGuiEx.IconButton(FontAwesomeIcon.Crosshairs, $"target{id}", enabled: Svc.Targets.Target != null))
         {
             value = Svc.Targets.Target.Position.ToVector2();
         }
-        ImGuiEx.Tooltip("To target positon");
+        ImGuiEx.Tooltip("获取目标位置");
         ImGui.SameLine(0, 1);
         if (ImGuiEx.IconButton(FontAwesomeIcon.MousePointer, $"target{id}", enabled: Player.Interactable))
         {
             BeginScreenToWorldSelection(id, value);
         }
         ScreenToWorldSelector(id, ref value);
-        ImGuiEx.Tooltip("Select with mouse");
+        ImGuiEx.Tooltip("用鼠标选择");
         /*ImGui.SameLine(0, 1);
         if(ImGuiEx.IconButton(FontAwesomeIcon.Flag, $"flag{id}", enabled: Player.Interactable && AgentMap.Instance()->IsFlagMarkerSet == true))
         {
             var marker = AgentMap.Instance()->FlagMapMarker;
             value = new(marker.XFloat, marker.YFloat);
         }*/
-        ImGuiEx.Tooltip("To map flag");
+        ImGuiEx.Tooltip("获取地图标记位置");
 
         ImGui.SameLine(0, 1);
         if (ImGuiEx.IconButton(FontAwesomeIcon.Brush, $"splatoon{id}"))
@@ -828,27 +828,27 @@ internal static unsafe partial class Utils
         {
             value = Player.Position;
         }
-        ImGuiEx.Tooltip("To player positon");
+        ImGuiEx.Tooltip("获取玩家位置");
         ImGui.SameLine(0, 1);
         if (ImGuiEx.IconButton(FontAwesomeIcon.Crosshairs, $"target{id}", enabled: Svc.Targets.Target != null))
         {
             value = Svc.Targets.Target.Position;
         }
-        ImGuiEx.Tooltip("To target positon");
+        ImGuiEx.Tooltip("获取目标位置");
         ImGui.SameLine(0, 1);
         if (ImGuiEx.IconButton(FontAwesomeIcon.MousePointer, $"target{id}", enabled: Player.Interactable))
         {
             BeginScreenToWorldSelection(id, value);
         }
         ScreenToWorldSelector(id, ref value);
-        ImGuiEx.Tooltip("Select with mouse");
+        ImGuiEx.Tooltip("用鼠标选择");
         /*ImGui.SameLine(0, 1);
         if(ImGuiEx.IconButton(FontAwesomeIcon.Flag, $"flag{id}", enabled: Player.Interactable && AgentMap.Instance()->IsFlagMarkerSet == true))
         {
             var marker = AgentMap.Instance()->FlagMapMarker;
             value = new(marker.XFloat, 0, marker.YFloat);
         }
-        ImGuiEx.Tooltip("To map flag");*/
+        ImGuiEx.Tooltip("获取地图标记位置");*/
 
         ImGui.SameLine(0, 1);
         if (ImGuiEx.IconButton(FontAwesomeIcon.Brush, $"splatoon{id}"))

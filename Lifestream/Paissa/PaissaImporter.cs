@@ -11,7 +11,7 @@ public class PaissaImporter
 {
     private static Guid CurrentDrag = Guid.Empty;
     private string ID;
-    private string folderText = "No folder yet...";
+    private string folderText = "暂无文件夹...";
     private bool buttonDisabled = false;
     private bool textToCopy = false;
     private DateTime disableEndTime;
@@ -38,7 +38,7 @@ public class PaissaImporter
         if (isDisabled)
             ImGui.BeginDisabled();
 
-        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Download, "Import from PaissaDB", enabled: Player.Available))
+        if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Download, "从 PaissaDB 导入", enabled: Player.Available))
         {
             PluginLog.Debug("PaissaDB import process initiated!");
             buttonDisabled = true;
@@ -148,24 +148,24 @@ public class PaissaImporter
                 }
                 if (ImGui.BeginPopup($"ABMenu {entry.GUID}"))
                 {
-                    if (ImGui.MenuItem("Copy chat-friendly name to clipboard"))
+                    if (ImGui.MenuItem("将适合聊天的名称复制到剪贴板"))
                     {
                         Copy(entry.GetAddressString());
                     }
                     ImGui.Separator();
-                    if (ImGui.MenuItem("Export to Clipboard"))
+                    if (ImGui.MenuItem("导出到剪贴板"))
                     {
                         Copy(EzConfig.DefaultSerializationFactory.Serialize(entry, false));
                     }
                     if (entry.Alias != "")
                     {
-                        ImGui.MenuItem($"Enable Alias: {entry.Alias}", ref entry.AliasEnabled);
+                        ImGui.MenuItem($"启用别名：{entry.Alias}", ref entry.AliasEnabled);
                     }
-                    if (ImGui.MenuItem("Edit..."))
+                    if (ImGui.MenuItem("编辑..."))
                     {
                         InputWardDetailDialog.Entry = entry;
                     }
-                    if (ImGui.MenuItem("Delete"))
+                    if (ImGui.MenuItem("删除"))
                     {
                         if (ImGuiEx.Ctrl)
                         {
@@ -173,10 +173,10 @@ public class PaissaImporter
                         }
                         else
                         {
-                            Svc.Toasts.ShowError($"Hold CTRL and click to delete an entry");
+                            Svc.Toasts.ShowError($"按住 CTRL 并单击以删除条目");
                         }
                     }
-                    ImGuiEx.Tooltip($"Hold CTRL and click to delete");
+                    ImGuiEx.Tooltip($"按住 CTRL 并单击以删除");
                     ImGui.EndPopup();
                 }
                 if (ImGui.BeginDragDropSource())
@@ -186,11 +186,11 @@ public class PaissaImporter
                     InternalLog.Verbose($"DragDropSource = {entry.GUID}");
                     if (book.SortMode == SortMode.Manual)
                     {
-                        ImGui.SetTooltip("Reorder or move to other folder");
+                        ImGui.SetTooltip("重新排序或移动到其他文件夹");
                     }
                     else
                     {
-                        ImGui.SetTooltip("Move to other folder");
+                        ImGui.SetTooltip("移至其他文件夹");
                     }
                     ImGui.EndDragDropSource();
                 }

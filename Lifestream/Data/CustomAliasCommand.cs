@@ -359,7 +359,7 @@ public unsafe class CustomAliasCommand
             {
                 if(!UIState.Instance()->IsAetheryteUnlocked(this.Aetheryte))
                 {
-                    error = $"Aethernet shard {Svc.Data.GetExcelSheet<Aetheryte>().GetRowOrDefault(this.Aetheryte)?.PlaceName.Value.Name ?? $"{this.Aetheryte}"} is not unlocked";
+                    error = $"以太水晶 {Svc.Data.GetExcelSheet<Aetheryte>().GetRowOrDefault(this.Aetheryte)?.PlaceName.Value.Name ?? $"{this.Aetheryte}"} 尚未解锁";
                     return false;
                 }
             }
@@ -367,7 +367,7 @@ public unsafe class CustomAliasCommand
             {
                 if(!UIState.Instance()->IsUnlockLinkUnlockedOrQuestCompleted(69208))
                 {
-                    error = $"Firmament is not unlocked";
+                    error = $"天穹街尚未解锁";
                     return false;
                 }
             }
@@ -375,7 +375,7 @@ public unsafe class CustomAliasCommand
             {
                 if (!UIState.Instance()->IsUnlockLinkUnlockedOrQuestCompleted(70847))
                 {
-                    error = $"Phantom Village is not unlocked";
+                    error = $"幻境村尚未解锁";
                     return false;
                 }
             }
@@ -384,7 +384,7 @@ public unsafe class CustomAliasCommand
         {
             if(!S.Data.DataStore.Worlds.Contains(ExcelWorldHelper.GetName(this.World)) && !S.Data.DataStore.DCWorlds.Contains(ExcelWorldHelper.GetName(this.World)))
             {
-                error = $"Can not visit {ExcelWorldHelper.GetName(this.World)} from {Player.CurrentWorld}";
+                error = $"无法从 {Player.CurrentWorld} 前往 {ExcelWorldHelper.GetName(this.World)}";
                 return false;
             }
         }

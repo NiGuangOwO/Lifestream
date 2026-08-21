@@ -148,9 +148,9 @@ public class PaissaUtils
         return status switch
         {
             PaissaStatus.Idle => "",
-            PaissaStatus.Progress => "Retrieving...",
-            PaissaStatus.Success => "Success!",
-            PaissaStatus.Error => "Error!",
+            PaissaStatus.Progress => "获取中...",
+            PaissaStatus.Success => "成功！",
+            PaissaStatus.Error => "错误！",
             _ => "",
         };
     }

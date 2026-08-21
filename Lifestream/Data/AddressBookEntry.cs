@@ -71,37 +71,37 @@ public class AddressBookEntry
     {
         if (Name == null)
         {
-            error = "Name is not a valid string";
+            error = "名称不是有效的字符串";
             return false;
         }
         if (!ExcelWorldHelper.GetPublicWorlds().Any(x => x.RowId == World))
         {
-            error = "World identifier is not valid";
+            error = "服务器标识无效";
             return false;
         }
         if (!Enum.GetValues<ResidentialAetheryteKind>().Contains(City))
         {
-            error = "Residential aetheryte is not valid";
+            error = "住宅区以太水晶无效";
             return false;
         }
         if (Ward < 1 || Ward > 30)
         {
-            error = "Ward number is out of range";
+            error = "小区编号超出范围";
             return false;
         }
         if (Plot < 1 || Plot > 60)
         {
-            error = "Plot number is out of range";
+            error = "地块编号超出范围";
             return false;
         }
         if (Apartment < 1)
         {
-            error = "Apartment number is out of range";
+            error = "公寓编号超出范围";
             return false;
         }
         if (Name == null)
         {
-            error = "Alias is not a valid string";
+            error = "别名不是有效的字符串";
             return false;
         }
         error = null;

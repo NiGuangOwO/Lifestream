@@ -294,7 +294,7 @@ public static class TabCustomAlias
         {
             new TickScheduler(() => selected.Commands.Remove(command));
         }
-        ImGuiEx.Tooltip("Press CTRL and click");
+        ImGuiEx.Tooltip("按住 CTRL 并单击");
 
         ImGui.SameLine();
         if (ImGuiEx.IconButtonWithText(FontAwesomeIcon.Play, "运行", enabled: !Utils.IsBusy()))
@@ -376,7 +376,7 @@ public static class TabCustomAlias
                 ImGui.SetNextItemWidth(150f.Scale());
                 ImGuiEx.FilteringInputInt("##cmdNum", out var cmdNum);
                 ImGui.SameLine();
-                if (ImGui.Button("OK"))
+                if (ImGui.Button("确定"))
                 {
                     selected.CopyTerritoryRange(index, cmdNum);
                     ImGui.CloseCurrentPopup();

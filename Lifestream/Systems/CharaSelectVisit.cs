@@ -11,6 +11,9 @@ using Lifestream.Tasks.SameWorld;
 namespace Lifestream.Systems;
 public static unsafe class CharaSelectVisit
 {
+    /// <summary>
+    /// 返回主世界（同 DC World Visit，国服原生支持）。
+    /// </summary>
     public static void HomeToHome(string destinationWorld, string charaName, uint homeWorld, uint currentLoginWorld, string secondaryTeleport = null, bool noSecondaryTeleport = false, WorldChangeAetheryte? gateway = null, bool? doNotify = null, bool? returnToGateway = null, bool noLogin = false)
     {
         ApplyDefaults(ref returnToGateway, ref gateway, ref doNotify);
@@ -36,10 +39,16 @@ public static unsafe class CharaSelectVisit
         }
     }
 
+    /// <summary>
+    /// 从访客大区返回本服（DCTravelerX isBack=true 返回原始大区）。
+    /// </summary>
     public static void GuestToHome(string destinationWorld, string charaName, uint homeWorld, uint currentLoginWorld, string secondaryTeleport = null, bool noSecondaryTeleport = false, WorldChangeAetheryte? gateway = null, bool? doNotify = null, bool? returnToGateway = null, bool skipReturn = false, bool noLogin = false)
     {
         ApplyDefaults(ref returnToGateway, ref gateway, ref doNotify);
-        if(!skipReturn) TaskReturnToHomeDC.Enqueue(charaName, homeWorld, currentLoginWorld);
+        if (!skipReturn)
+        {
+            TaskTravelViaDCTraveler.Enqueue(destinationWorld, charaName, homeWorld, currentLoginWorld, true);
+        }
         if(!noLogin)
         {
             TaskSelectChara.Enqueue(charaName, homeWorld, currentLoginWorld);
@@ -61,35 +70,41 @@ public static unsafe class CharaSelectVisit
         }
     }
 
+    /// <summary>
+    /// 从本服前往其他大区（DCTravelerX isBack=false 超域旅行）。
+    /// </summary>
     public static void HomeToGuest(string destinationWorld, string charaName, uint homeWorld, uint currentLoginWorld, string secondaryTeleport = null, bool noSecondaryTeleport = false, WorldChangeAetheryte? gateway = null, bool? doNotify = null, bool? returnToGateway = null, bool noLogin = false)
     {
         ApplyDefaults(ref returnToGateway, ref gateway, ref doNotify);
-        TaskChangeDatacenter.Enqueue(destinationWorld, charaName, homeWorld, currentLoginWorld);
+        TaskTravelViaDCTraveler.Enqueue(destinationWorld, charaName, homeWorld, currentLoginWorld, false);
         if(!noLogin)
         {
             TaskSelectChara.Enqueue(charaName, homeWorld, currentLoginWorld);
             TaskWaitUntilInWorld.Enqueue(destinationWorld, true);
             TaskEnforceWorld.Enqueue(destinationWorld, gateway);
-
-
             if(gateway != null && returnToGateway == true) TaskReturnToGateway.Enqueue(gateway.Value);
             if(doNotify == true) TaskDesktopNotification.Enqueue($"Arrived to {destinationWorld}");
             EnqueueSecondary(noSecondaryTeleport, secondaryTeleport);
         }
     }
 
+    /// <summary>
+    /// 从访客大区前往第三个大区：先返回原始大区，再超域旅行至目标。
+    /// </summary>
     public static void GuestToGuest(string destinationWorld, string charaName, uint homeWorld, uint currentLoginWorld, string secondaryTeleport = null, bool noSecondaryTeleport = false, WorldChangeAetheryte? gateway = null, bool? doNotify = null, bool? returnToGateway = null, bool noLogin = false, bool useSameWorldReturnHome = false)
     {
         ApplyDefaults(ref returnToGateway, ref gateway, ref doNotify);
-        if(useSameWorldReturnHome)
+        if (useSameWorldReturnHome)
         {
+            // 玩家在本服 DC 的其他世界：先 World Visit 返回主世界，再超域旅行
             TaskReturnToHomeWorldCharaSelect.Enqueue(charaName, homeWorld, currentLoginWorld);
         }
         else
         {
-            TaskReturnToHomeDC.Enqueue(charaName, homeWorld, currentLoginWorld);
+            // 玩家在访客 DC：先 DCTraveler 返回原始大区，再超域旅行去目标
+            TaskTravelViaDCTraveler.Enqueue(destinationWorld, charaName, homeWorld, currentLoginWorld, true);
         }
-        TaskChangeDatacenter.Enqueue(destinationWorld, charaName, homeWorld, currentLoginWorld);
+        TaskTravelViaDCTraveler.Enqueue(destinationWorld, charaName, homeWorld, homeWorld, false);
         if(!noLogin)
         {
             TaskSelectChara.Enqueue(charaName, homeWorld, currentLoginWorld);

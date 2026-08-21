@@ -67,10 +67,6 @@ public class Config : IEzConfig
     public uint PreferredInn = 0;
     public List<AutoPropertyData> PropertyPrio = [new(true, TaskPropertyShortcut.PropertyType.个人房屋), new(true, TaskPropertyShortcut.PropertyType.部队房屋), new(true, TaskPropertyShortcut.PropertyType.公寓), new(true, TaskPropertyShortcut.PropertyType.旅馆), new(false, TaskPropertyShortcut.PropertyType.共享房屋)];
     public Dictionary<ulong, List<AutoPropertyData>> PropertyPrioOverrides = [];
-    public bool EnableDvcRetry = true;
-    public int MaxDcvRetries = 3000;
-    public bool DcvUseAlternativeWorld = true;
-    public int DcvRetryInterval = 30;
     public bool RetryWorldVisit = true;
     public int RetryWorldVisitInterval = 30;
     public int RetryWorldVisitIntervalDelta = 10;

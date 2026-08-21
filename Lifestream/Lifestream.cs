@@ -103,6 +103,7 @@ public unsafe class Lifestream : IDalamudPlugin
             Svc.Toasts.ErrorToast += Toasts_ErrorToast;
             AutoRetainerApi = new();
             NotificationMasterApi = new(Svc.PluginInterface);
+            DCTravelerIpc.Init();
             SingletonServiceManager.Initialize(typeof(Service));
         });
     }
@@ -497,6 +498,11 @@ public unsafe class Lifestream : IDalamudPlugin
             Utils.DisplayInfo($"目的地：{destinationWorld}");
             if (isDcTransfer)
             {
+                if ((int)Svc.Data.Language >= 4 && !DCTravelerIpc.IsAvailable())
+                {
+                    Notify.Error("国服跨大区需要安装并启用 DCTravelerX 插件");
+                    return;
+                }
                 var type = DCVType.Unknown;
                 var homeDC = Player.Object.HomeWorld.ValueNullable?.DataCenter.ValueNullable?.Name.ToString() ?? throw new NullReferenceException("Home DC is null ??????");
                 var currentDC = Player.Object.CurrentWorld.ValueNullable?.DataCenter.ValueNullable?.Name.ToString() ?? throw new NullReferenceException("Current DC is null ??????");
@@ -537,17 +543,17 @@ public unsafe class Lifestream : IDalamudPlugin
                     if (!Player.IsInHomeWorld)
                         TaskTPAndChangeWorld.Enqueue(Player.HomeWorld, gateway.Value.AdjustGateway(), false);
                     TaskWaitUntilInHomeWorld.Enqueue();
-                    TaskLogoutAndRelog.Enqueue(Player.NameWithWorld);
+                    TaskLogout.Enqueue();
                     CharaSelectVisit.HomeToGuest(destinationWorld, Player.Name, Player.HomeWorldId, Player.HomeWorldId, secondaryTeleport, noSecondaryTeleport, gateway, doNotify, returnToGateway);
                 }
                 else if (type == DCVType.GuestToHome)
                 {
-                    TaskLogoutAndRelog.Enqueue(Player.NameWithWorld);
+                    TaskLogout.Enqueue();
                     CharaSelectVisit.GuestToHome(destinationWorld, Player.Name, Player.HomeWorldId, Player.CurrentWorldId, secondaryTeleport, noSecondaryTeleport, gateway, doNotify, returnToGateway);
                 }
                 else if (type == DCVType.GuestToGuest)
                 {
-                    TaskLogoutAndRelog.Enqueue(Player.NameWithWorld);
+                    TaskLogout.Enqueue();
                     CharaSelectVisit.GuestToGuest(destinationWorld, Player.Name, Player.HomeWorldId, Player.CurrentWorldId, secondaryTeleport, noSecondaryTeleport, gateway, doNotify, returnToGateway);
                 }
                 else

@@ -35,12 +35,12 @@ internal static unsafe class UISettings
             ImGui.SetNextItemWidth(200f.Scale());
             ImGuiEx.EnumCombo($"跨服传送水晶", ref C.WorldChangeAetheryte, Lang.WorldChangeAetherytes);
             ImGuiEx.HelpMarker($"你想传送到哪里来跨服");
-            ImGui.Checkbox($"访问 服务器/大区 后传送到指定的以太网目的地", ref C.WorldVisitTPToAethernet);
+            ImGui.Checkbox($"访问 服务器/大区 后传送到指定的以太水晶目的地", ref C.WorldVisitTPToAethernet);
             if (C.WorldVisitTPToAethernet)
             {
                 ImGui.Indent();
                 ImGui.SetNextItemWidth(250f.Scale());
-                ImGui.InputText("以太网目的地，就像您在“/li”命令中使用的一样", ref C.WorldVisitTPTarget, 50);
+                ImGui.InputText("以太水晶目的地，就像您在“/li”命令中使用的一样", ref C.WorldVisitTPTarget, 50);
                 ImGui.Checkbox($"只能通过指令传送，不能通过悬浮窗传送。", ref C.WorldVisitTPOnlyCmd);
                 ImGui.Unindent();
             }
@@ -48,7 +48,7 @@ internal static unsafe class UISettings
             ImGui.Checkbox($"跨服时自动离开非跨服队伍", ref C.LeavePartyBeforeWorldChange);
             ImGui.Checkbox($"在聊天中显示传送目的地", ref C.DisplayChatTeleport);
             ImGui.Checkbox($"在弹出通知中显示传送目的地", ref C.DisplayPopupNotifications);
-            ImGui.Checkbox("重试同服务器失败的服务器访问", ref C.RetryWorldVisit);
+            ImGui.Checkbox("重试同服务器失败的世界访问（跨服）", ref C.RetryWorldVisit);
             ImGui.Indent();
             ImGui.SetNextItemWidth(100f.Scale());
             ImGui.InputInt("重试间隔（秒）##2", ref C.RetryWorldVisitInterval.ValidateRange(1, 120));
@@ -191,22 +191,18 @@ internal static unsafe class UISettings
             ImGui.Unindent();
         })
 
-        .Section("跨大区（国服不可用）")
+        .Section((int)Svc.Data.Language >= 4 ? "跨大区（国服·DCTravelerX）" : "跨大区（国服不可用）")
         .Widget(() =>
         {
+            if ((int)Svc.Data.Language >= 4)
+            {
+                ImGuiEx.Text($"国服跨大区需要 DCTravelerX 插件，且需使用 XIVLauncherCN 登录");
+                ImGui.Separator();
+            }
             ImGui.Checkbox($"允许前往另一个大区", ref C.AllowDcTransfer);
             ImGui.Checkbox($"切换大区前离开队伍", ref C.LeavePartyBeforeLogout);
             ImGui.Checkbox($"如果不在休息区，则在跨大区之前传送到以太之光", ref C.TeleportToGatewayBeforeLogout);
             ImGui.Checkbox($"完成跨大区后传送到以太之光", ref C.DCReturnToGateway);
-            ImGui.Checkbox($"跨大区期间允许选择服务器", ref C.DcvUseAlternativeWorld);
-            ImGuiEx.HelpMarker("如果目标服务器不可用，但目标大区上的其他服务器可用，则会选择该服务器。正常登录后会切换服务器。");
-            ImGui.Checkbox($"如果目标服务器不可用，重试跨大区", ref C.EnableDvcRetry);
-            ImGui.Indent();
-            ImGui.SetNextItemWidth(150f.Scale());
-            ImGui.InputInt("最大重试次数", ref C.MaxDcvRetries.ValidateRange(1, int.MaxValue));
-            ImGui.SetNextItemWidth(150f.Scale());
-            ImGui.InputInt("重试间隔，秒", ref C.DcvRetryInterval.ValidateRange(10, 1000));
-            ImGui.Unindent();
         })
 
         .Section("地址簿")
@@ -231,13 +227,13 @@ internal static unsafe class UISettings
         .Checkbox("自动移动时使用速行", () => ref C.UsePeloton)
 
         .Section("角色选择菜单")
-        .Checkbox("从角色选择菜单启用数据中心和服务器访问", () => ref C.AllowDCTravelFromCharaSelect)
-        .Checkbox("使用跨服而不是跨大区，即可在访问其他大区前往同一服务器。", () => ref C.UseGuestWorldTravel)
+        .Checkbox("从角色选择菜单启用跨大区和跨服访问", () => ref C.AllowDCTravelFromCharaSelect)
+        .Checkbox("在访客大区时使用跨服访问而非跨大区访问，前往同一世界的服务器", () => ref C.UseGuestWorldTravel)
 
         .Section("Wotsit 集成")
         .Widget(() =>
         {
-            var anyChanged = ImGui.Checkbox("启用 Wotsit 集成以传送至以太网目的地", ref C.WotsitIntegrationEnabled);
+            var anyChanged = ImGui.Checkbox("启用 Wotsit 集成以传送至以太水晶目的地", ref C.WotsitIntegrationEnabled);
             ImGuiEx.PluginAvailabilityIndicator([new("Dalamud.FindAnything", "Wotsit")]);
 
             if (C.WotsitIntegrationEnabled)
@@ -279,7 +275,7 @@ internal static unsafe class UISettings
                 {
                     anyChanged = true;
                 }
-                if (ImGui.Checkbox("包括自动传送至以太网目的地", ref C.WotsitIntegrationIncludes.AetheryteAethernet))
+                if (ImGui.Checkbox("包括自动传送至以太水晶目的地", ref C.WotsitIntegrationIncludes.AetheryteAethernet))
                 {
                     anyChanged = true;
                 }

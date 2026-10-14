@@ -1814,7 +1814,11 @@ internal static unsafe partial class Utils
 
     internal static AtkUnitBase* GetSpecificYesno(params string[] s) => GetSpecificYesno(false, s);
 
-    internal static AtkUnitBase* GetSpecificYesno(bool contains, params string[] s)
+    internal static AtkUnitBase* GetSpecificYesno(bool contains, params string[] s) => GetSpecificYesno(text =>
+        contains ? text.Replace(" ", "").ContainsAny(s.Select(x => x.Replace(" ", "")))
+        : text.Replace(" ", "").EqualsAny(s.Select(x => x.Replace(" ", ""))));
+
+    internal static AtkUnitBase* GetSpecificYesno(Func<string, bool> matches)
     {
         for (var i = 1; i < 100; i++)
         {
@@ -1826,13 +1830,10 @@ internal static unsafe partial class Utils
                 if (IsAddonReady(addon))
                 {
                     var textNode = addon->UldManager.NodeList[15]->GetAsAtkTextNode();
-                    var text = GenericHelpers.ReadSeString(&textNode->NodeText).GetText().Replace(" ", "");
-                    if (contains ?
-                        text.ContainsAny(s.Select(x => x.Replace(" ", "")))
-                        : text.EqualsAny(s.Select(x => x.Replace(" ", "")))
-                        )
+                    var text = GenericHelpers.ReadSeString(&textNode->NodeText).GetText();
+                    if(matches(text))
                     {
-                        PluginLog.Verbose($"SelectYesno {s.Print()} addon {i}");
+                        PluginLog.Verbose($"SelectYesno addon {i}");
                         return addon;
                     }
                 }
@@ -1844,6 +1845,18 @@ internal static unsafe partial class Utils
             }
         }
         return null;
+    }
+
+    internal static AtkUnitBase* GetLogOutYesno()
+    {
+        var addon = GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>().GetRow(115).Text.GetText());
+        if (addon == null)
+        {
+            // version when the local player is currently queueing for a duty
+            addon = GetSpecificYesno(Svc.Data.GetExcelSheet<Addon>().GetRow(17531).Text.GetText());
+        }
+
+        return addon;
     }
 
     internal static List<string> GetAvailableWorldDestinations()
@@ -1999,5 +2012,15 @@ internal static unsafe partial class Utils
     internal static void MigrateConfigButtonWidthToButtonWidthArray()
     {
         C.ButtonWidthArray = [C.ButtonWidth, C.ButtonWidth, C.ButtonWidth];
+    }
+
+    public static bool IsLoggingOutInstant(uint territoryType)
+    {
+        if(Svc.Data.GetExcelSheet<TerritoryType>().TryGetRow(territoryType, out var sheet))
+        {
+            return sheet.TerritoryIntendedUse.Value.DisableLogoutTimer;
+        }
+
+        return false;
     }
 }
